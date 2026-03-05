@@ -23,7 +23,3 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: pihole-values
-    - kind: Secret
-      name: pihole-admin-secret
-      valuesKey: password
-      targetPath: adminPassword

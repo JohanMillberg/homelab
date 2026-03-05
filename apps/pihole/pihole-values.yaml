@@ -29,3 +29,7 @@ data:
 
     customDnsEntries:
       - address=/pihole.lan/192.168.1.205
+
+    admin:
+      existingSecret: pihole-admin-secret
+      passwordKey: password
