@@ -4,3 +4,4 @@ resources:
   - namespace.yaml
   - pihole-values.yaml
   - pihole-helmrelease.yaml
+  - pihole-sealed-secret.yaml
