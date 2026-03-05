@@ -1,32 +1,25 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: longhorn-system
----
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: longhorn
-  namespace: longhorn-system
+  name: pihole
+  namespace: pihole
 spec:
   interval: 1h
   chart:
     spec:
-      chart: longhorn
-      version: "1.8.x"
+      chart: pihole
+      version: "2.x"
       sourceRef:
         kind: HelmRepository
-        name: longhorn
+        name: mojo2600
         namespace: flux-system
       interval: 1h
   install:
-    crds: CreateReplace
     remediation:
       retries: 3
   upgrade:
-    crds: CreateReplace
     remediation:
       retries: 3
-  values:
-    defaultSettings:
-      defaultReplicaCount: 1
+  valuesFrom:
+    - kind: ConfigMap
+      name: pihole-values

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-values
+  namespace: pihole
+data:
+  values.yaml: |
+    persistentVolumeClaim:
+      enabled: true
+      storageClass: longhorn
+
+    serviceDns:
+      type: LoadBalancer
+
+    serviceWeb:
+      type: ClusterIP
+
+    ingress:
+      enabled: true
+      hosts:
+        - pihole.lan
+
+    podDnsConfig:
+      enabled: true
+      policy: "None"
+      nameservers:
+        - 127.0.0.1
+        - 1.1.1.1
