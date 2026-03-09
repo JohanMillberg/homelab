@@ -26,7 +26,3 @@ data:
           paths:
             - path: /
               pathType: Prefix
-
-    service:
-      ssh:
-        type: LoadBalancer
