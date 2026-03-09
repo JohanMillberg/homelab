@@ -6,3 +6,4 @@ resources:
   - mojo2600-helmrepo.yaml
   - sealed-secrets-helmrepo.yaml
   - sealed-secrets-helmrelease.yaml
+  - forgejo-helmrepo.yaml
