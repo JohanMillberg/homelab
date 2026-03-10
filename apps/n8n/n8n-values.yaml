@@ -9,6 +9,7 @@ data:
       config:
         n8n:
           hide_usage_page: true
+          secure_cookie: false
         
       persistence:
         enabled: true
