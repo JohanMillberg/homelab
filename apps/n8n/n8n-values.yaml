@@ -9,8 +9,11 @@ data:
       config:
         n8n:
           hide_usage_page: true
-          secure_cookie: false
-        
+
+      extraEnv:
+        N8N_SECURE_COOKIE:
+          value: "false"
+
       persistence:
         enabled: true
         type: dynamic
