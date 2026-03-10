@@ -6,6 +6,8 @@ metadata:
 data:
   values.yaml: |
     main:
+      image:
+        tag: "2.6.1"
       config:
         n8n:
           hide_usage_page: true
@@ -18,6 +20,10 @@ data:
           value: "http://n8n.lan"
         N8N_DIAGNOSTICS_ENABLED:
           value: "false"
+        N8N_PORT:
+          value: "5678"
+        N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS:
+          value: "true"
 
       persistence:
         enabled: true
