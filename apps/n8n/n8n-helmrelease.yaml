@@ -1,0 +1,27 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: n8n
+  namespace: n8n
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: n8n
+      version: "2.x"
+      sourceRef:
+        kind: HelmRepository
+        name: n8n
+        namespace: flux-system
+      interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  valuesFrom:
+    - kind: ConfigMap
+      name: n8n-values
+    - kind: Secret
+      name: n8n-secret-values

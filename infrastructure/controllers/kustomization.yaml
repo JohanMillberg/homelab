@@ -7,3 +7,4 @@ resources:
   - sealed-secrets-helmrepo.yaml
   - sealed-secrets-helmrelease.yaml
   - forgejo-helmrepo.yaml
+  - n8n-helmrepo.yaml

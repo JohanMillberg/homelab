@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: n8n-values
+  namespace: n8n
+data:
+  values.yaml: |
+    main:
+      config:
+        n8n:
+          hide_usage_page: true
+        
+      persistence:
+        enabled: true
+        type: dynamic
+        storageClass: longhorn
+        size: 5Gi
+        accessModes:
+          - ReadWriteOnce
+
+    resources:
+      limits:
+        memory: 2048Mi
+      requests:
+        memory: 512Mi
+
+    ingress:
+      enabled: true
+      hosts:
+        - host: n8n.lan
+          paths:
+            - path: /
+              pathType: Prefix
