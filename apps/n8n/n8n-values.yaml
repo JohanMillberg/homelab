@@ -15,8 +15,8 @@ data:
           value: "false"
         N8N_EDITOR_BASE_URL:
           value: "http://n8n.lan"
-        N8N_TRUST_PROXY:
-          value: "true"
+        N8N_PROXY_HOPS:
+          value: "1"
 
       persistence:
         enabled: true
