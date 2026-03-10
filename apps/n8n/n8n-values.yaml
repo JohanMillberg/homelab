@@ -7,7 +7,9 @@ data:
   values.yaml: |
     main:
       image:
-        tag: "2.6.1"
+        repository: n8nio/n8n
+        pullPolicy: IfNotPresent
+        tag: "2.11.2"
       config:
         n8n:
           hide_usage_page: true
