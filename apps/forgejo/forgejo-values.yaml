@@ -9,15 +9,15 @@ data:
     gitea:
       admin:
         username: johan
-        password: admin
+        password: admin1234
       config:
         indexer:
           REPO_INDEXER_ENABLED: true
 
-    persistance:
-      enable: true
-    storageClass: longhorn
-    size: 10Gi
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      size: 10Gi
 
     ingress:
       enabled: true
