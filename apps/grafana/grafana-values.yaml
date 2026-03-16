@@ -19,24 +19,11 @@ data:
             url: http://prometheus-server.prometheus.svc.cluster.local
             isDefault: true
 
-    dashboardProviders:
-      dashboardproviders.yaml:
-        apiVersion: 1
-        providers:
-          - name: default
-            orgId: 1
-            folder: ""
-            type: file
-            disableDeletion: false
-            options:
-              path: /var/lib/grafana/dashboards/default
-
     sidecar:
       dashboards:
         enabled: true
         label: grafana_dashboard
         labelValue: "1"
-        folder: /var/lib/grafana/dashboards/default
         searchNamespace: grafana
 
     ingress:
