@@ -41,8 +41,14 @@ flux reconcile kustomization infrastructure-controllers --with-source
 | pihole | pihole | mojo2600 (HTTP) |
 | forgejo | forgejo | OCI `code.forgejo.org/forgejo-helm/` |
 | n8n | n8n | OCI `8gears.container-registry.com/library` |
+| grafana | grafana | grafana (HTTP, grafana.github.io/helm-charts) |
+| prometheus | prometheus | prometheus-community (HTTP) |
 
 Infrastructure: longhorn (storage), sealed-secrets (secret encryption).
+
+**Chart version → App version notes (as of 2026-03):**
+- `grafana/grafana` chart `10.x` → Grafana app **12.x** (supports `grafanactl`)
+- `prometheus-community/prometheus` chart `28.x`
 
 ## Key Conventions
 
@@ -52,7 +58,7 @@ Infrastructure: longhorn (storage), sealed-secrets (secret encryption).
 - **Sensitive values**: always in SealedSecret, never in ConfigMap
 - **HelmRepository namespace**: always `flux-system`
 - **OCI repos**: require `type: "oci"` and `oci://` URL; HTTP repos omit `type`
-- **DNS**: internal hostnames follow `<name>.lan`, resolved via pihole at `192.168.1.205`
+- **DNS**: internal hostnames follow `<name>.lan`, resolved via pihole at `192.168.1.205` — **note:** the node itself uses 1.1.1.1 for DNS, so `.lan` hostnames do not resolve in SSH commands; use cluster IPs or `kubectl port-forward` instead
 
 ## Skills
 
@@ -60,6 +66,10 @@ Use the skills in `.claude/skills/` for common tasks:
 
 - **`add-app`** — scaffold a complete new app (HelmRepo → HelmRelease → values → kustomization wiring)
 - **`upgrade-app`** — upgrade a chart version or pinned image tag
+- **`seal-secret`** — create, update, or verify a SealedSecret (Claude runs kubeseal on the server)
+- **`debug-flux`** — diagnose and fix stuck HelmReleases (Claude SSHes in and applies fixes)
+- **`ssh-debug`** — full node-level triage via SSH (Claude runs diagnostics and fixes on the server)
+- **`manage-grafana-dashboards`** — add, update, or verify a Grafana dashboard (JSON → kustomization wiring → grafanactl verification)
 
 ## Sealed Secrets Workflow
 
