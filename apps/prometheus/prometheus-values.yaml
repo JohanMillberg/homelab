@@ -38,7 +38,7 @@ data:
               names: [pihole]
         relabel_configs:
           - source_labels: [__meta_kubernetes_pod_container_name]
-            regex: pihole-exporter
+            regex: exporter
             action: keep
           - source_labels: [__meta_kubernetes_pod_ip]
             action: replace
