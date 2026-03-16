@@ -2,10 +2,10 @@
   "__inputs": [
     {
       "name": "DS_PROMETHEUS",
-      "label": "prometheus",
-      "description": "prometheus",
+      "label": "${datasource}",
+      "description": "${datasource}",
       "type": "datasource",
-      "pluginId": "prometheus",
+      "pluginId": "${datasource}",
       "pluginName": "Prometheus"
     }
   ],
@@ -24,7 +24,7 @@
     },
     {
       "type": "datasource",
-      "id": "prometheus",
+      "id": "${datasource}",
       "name": "Prometheus",
       "version": "5.0.0"
     },
@@ -94,9 +94,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -111,13 +111,13 @@
         "lineColor": "rgb(0, 192, 255)",
         "show": true
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "sum(nginx_connections_total{type=\"active\"})",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "prometheus",
+          "legendFormat": "${datasource}",
           "metric": "node_memory_MemTotal",
           "refId": "A",
           "step": 40
@@ -178,9 +178,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -195,13 +195,13 @@
         "lineColor": "rgb(31, 120, 193)",
         "show": true
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "sort_desc(min(avg(rate(node_cpu_seconds_total{mode=\"idle\"}[2m])) by (instance)))",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "prometheus",
+          "legendFormat": "${datasource}",
           "refId": "A",
           "step": 40
         }
@@ -229,7 +229,7 @@
         "rgba(50, 172, 45, 0.97)"
       ],
       "datasource": "${DS_PROMETHEUS}",
-      "description": "prometheus",
+      "description": "${datasource}",
       "format": "percentunit",
       "gauge": {
         "maxValue": 1,
@@ -261,9 +261,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -278,7 +278,7 @@
         "lineColor": "rgb(31, 120, 193)",
         "show": true
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "min(node_filesystem_avail_bytes{mountpoint!~\".*(serviceaccount|proc|sys).*\"}/node_filesystem_size_bytes{mountpoint!~\".*(serviceaccount|proc|sys).*\"})",
@@ -342,9 +342,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -359,13 +359,13 @@
         "lineColor": "rgb(31, 120, 193)",
         "show": true
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "min(node_memory_MemAvailable_bytes/node_memory_MemTotal_bytes)",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "prometheus",
+          "legendFormat": "${datasource}",
           "metric": "node_memory_MemTotal",
           "refId": "A",
           "step": 40
@@ -425,9 +425,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -442,13 +442,13 @@
         "lineColor": "rgb(0, 192, 255)",
         "show": true
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "avg(irate(http_request_duration_seconds_count{status=\"200\", method=\"GET\"}[10m]))",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "prometheus",
+          "legendFormat": "${datasource}",
           "metric": "node_memory_MemTotal",
           "refId": "A",
           "step": 40
@@ -477,7 +477,7 @@
         "rgba(245, 54, 54, 0.9)"
       ],
       "datasource": "${DS_PROMETHEUS}",
-      "description": "prometheus",
+      "description": "${datasource}",
       "format": "none",
       "gauge": {
         "maxValue": 10,
@@ -509,9 +509,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -526,7 +526,7 @@
         "lineColor": "rgb(0, 192, 255)",
         "show": true
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "count(sum by (pod)(delta(kube_pod_container_status_restarts_total[15m]) > 0))",
@@ -570,7 +570,7 @@
         "x": 14,
         "y": 0
       },
-      "height": "prometheus",
+      "height": "${datasource}",
       "id": 16,
       "legend": {
         "alignAsTable": true,
@@ -687,7 +687,7 @@
           "expr": "sum (kube_pod_status_phase{}) by (phase)",
           "format": "time_series",
           "hide": false,
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "intervalFactor": 2,
           "legendFormat": "{{ phase }}",
           "metric": "kube_pod_status_phase",
@@ -956,7 +956,7 @@
         {
           "expr": "avg(rate(node_cpu_seconds_total{mode=\"idle\"}[2m])) by (instance)",
           "format": "time_series",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "intervalFactor": 2,
           "legendFormat": "{{ instance }}",
           "refId": "A",
@@ -983,7 +983,7 @@
       "yaxes": [
         {
           "format": "percentunit",
-          "label": "prometheus",
+          "label": "${datasource}",
           "logBase": 1,
           "max": "1",
           "min": "0",
@@ -1016,7 +1016,7 @@
         "x": 18,
         "y": 8
       },
-      "height": "prometheus",
+      "height": "${datasource}",
       "id": 1,
       "legend": {
         "alignAsTable": true,
@@ -1044,7 +1044,7 @@
         {
           "expr": "min(node_filesystem_avail_bytes{mountpoint!~\".*(serviceaccount|proc|sys).*\", device!=\"overlay\"}/node_filesystem_size_bytes{mountpoint!~\".*(serviceaccount|proc|sys).*\", device!=\"overlay\"}) by (device, instance)",
           "format": "time_series",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "intervalFactor": 2,
           "legendFormat": "{{instance}}",
           "refId": "A",
@@ -1071,7 +1071,7 @@
       "yaxes": [
         {
           "format": "percentunit",
-          "label": "prometheus",
+          "label": "${datasource}",
           "logBase": 1,
           "max": "1",
           "min": "0",
@@ -1131,7 +1131,7 @@
           "expr": "rate(node_disk_io_time_seconds_total[2m])",
           "format": "time_series",
           "hide": false,
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "intervalFactor": 2,
           "legendFormat": "{{instance}} {{device}}",
           "refId": "A",
@@ -1307,7 +1307,7 @@
         {
           "expr": "topk(5, sum(rate(container_cpu_usage_seconds_total{image!=\"\",name=~\"^k8s_.*\",container_name!=\"POD\"}[2m])) by (pod_name, container_name))",
           "format": "time_series",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "intervalFactor": 2,
           "legendFormat": "{{ container_name }} in {{ pod_name }}",
           "metric": "container_cpu_usage_seconds_total",
@@ -1361,7 +1361,21 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Data Source",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      }
+    ]
   },
   "time": {
     "from": "now-30m",
@@ -1392,7 +1406,7 @@
       "30d"
     ]
   },
-  "timezone": "prometheus",
+  "timezone": "${datasource}",
   "title": "Kubernetes Cluster",
   "uid": "os6Bh8Omk",
   "version": 25,

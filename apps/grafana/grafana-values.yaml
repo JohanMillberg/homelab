@@ -16,7 +16,6 @@ data:
         datasources:
           - name: Prometheus
             type: prometheus
-            uid: prometheus
             url: http://prometheus-server.prometheus.svc.cluster.local
             isDefault: true
 

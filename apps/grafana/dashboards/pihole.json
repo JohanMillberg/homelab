@@ -3,9 +3,9 @@
     {
       "name": "DS_PROMETHEUS",
       "label": "Prometheus",
-      "description": "prometheus",
+      "description": "${datasource}",
       "type": "datasource",
-      "pluginId": "prometheus",
+      "pluginId": "${datasource}",
       "pluginName": "Prometheus"
     }
   ],
@@ -14,7 +14,7 @@
       "type": "panel",
       "id": "gauge",
       "name": "Gauge",
-      "version": "prometheus"
+      "version": "${datasource}"
     },
     {
       "type": "grafana",
@@ -32,11 +32,11 @@
       "type": "panel",
       "id": "graph",
       "name": "Graph",
-      "version": "prometheus"
+      "version": "${datasource}"
     },
     {
       "type": "datasource",
-      "id": "prometheus",
+      "id": "${datasource}",
       "name": "Prometheus",
       "version": "1.0.0"
     },
@@ -44,13 +44,13 @@
       "type": "panel",
       "id": "singlestat",
       "name": "Singlestat",
-      "version": "prometheus"
+      "version": "${datasource}"
     },
     {
       "type": "panel",
       "id": "table",
       "name": "Table",
-      "version": "prometheus"
+      "version": "${datasource}"
     }
   ],
   "annotations": {
@@ -138,9 +138,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -155,12 +155,12 @@
         "lineColor": "rgb(31, 120, 193)",
         "show": false
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "pihole_status{hostname=~'$node'}",
           "instant": true,
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ legend }}",
           "refId": "A"
         }
@@ -235,9 +235,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -252,17 +252,17 @@
         "lineColor": "rgb(31, 120, 193)",
         "show": false
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "pihole_domains_being_blocked{hostname=~'$node'}",
           "instant": false,
-          "interval": "prometheus",
-          "legendFormat": "prometheus",
+          "interval": "${datasource}",
+          "legendFormat": "${datasource}",
           "refId": "A"
         }
       ],
-      "thresholds": "prometheus",
+      "thresholds": "${datasource}",
       "timeFrom": null,
       "timeShift": null,
       "title": "Domains being blocked",
@@ -325,9 +325,9 @@
       "maxDataPoints": 100,
       "nullPointMode": "connected",
       "nullText": null,
-      "postfix": "prometheus",
+      "postfix": "${datasource}",
       "postfixFontSize": "50%",
-      "prefix": "prometheus",
+      "prefix": "${datasource}",
       "prefixFontSize": "50%",
       "rangeMaps": [
         {
@@ -342,16 +342,16 @@
         "lineColor": "rgb(31, 120, 193)",
         "show": false
       },
-      "tableColumn": "prometheus",
+      "tableColumn": "${datasource}",
       "targets": [
         {
           "expr": "pihole_unique_domains{hostname=~'$node'}",
-          "interval": "prometheus",
-          "legendFormat": "prometheus",
+          "interval": "${datasource}",
+          "legendFormat": "${datasource}",
           "refId": "A"
         }
       ],
-      "thresholds": "prometheus",
+      "thresholds": "${datasource}",
       "timeFrom": null,
       "timeShift": null,
       "title": "Unique domains",
@@ -393,7 +393,7 @@
       "id": 70,
       "interval": null,
       "legend": {
-        "header": "prometheus",
+        "header": "${datasource}",
         "show": false,
         "values": true
       },
@@ -407,7 +407,7 @@
         {
           "expr": "pihole_top_queries{hostname=~'$node'}",
           "instant": true,
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ domain }}",
           "refId": "A"
         }
@@ -459,7 +459,7 @@
       "targets": [
         {
           "expr": "pihole_reply{hostname='$node'}",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ type }}",
           "refId": "A"
         }
@@ -509,7 +509,7 @@
       "targets": [
         {
           "expr": "pihole_top_ads{hostname=~'$node'}",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ domain }}",
           "refId": "A"
         }
@@ -590,7 +590,7 @@
       "targets": [
         {
           "expr": "pihole_dns_queries_all_types{hostname=~'$node'}",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ job }}",
           "refId": "A"
         }
@@ -688,7 +688,7 @@
           "calcs": [
             "mean"
           ],
-          "fields": "prometheus",
+          "fields": "${datasource}",
           "values": false
         },
         "showThresholdLabels": false,
@@ -699,8 +699,8 @@
         {
           "expr": "pihole_ads_percentage_today{hostname=~'$node'}",
           "instant": false,
-          "interval": "prometheus",
-          "legendFormat": "prometheus",
+          "interval": "${datasource}",
+          "legendFormat": "${datasource}",
           "refId": "A"
         }
       ],
@@ -764,7 +764,7 @@
         {
           "expr": "pihole_ads_blocked_today{hostname=~'$node'}",
           "instant": false,
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ job }}",
           "refId": "A"
         }
@@ -861,13 +861,13 @@
       "targets": [
         {
           "expr": "pihole_queries_cached{hostname=~'$node'}",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "Queries cached",
           "refId": "A"
         },
         {
           "expr": "pihole_queries_forwarded{hostname=~'$node'}",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "Queries forwarded",
           "refId": "B"
         }
@@ -964,7 +964,7 @@
       "targets": [
         {
           "expr": "pihole_querytypes",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ type }}",
           "refId": "A"
         }
@@ -1063,7 +1063,7 @@
       "targets": [
         {
           "expr": "pihole_ads_percentage_today",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ job }}",
           "refId": "A"
         }
@@ -1137,7 +1137,7 @@
       },
       "styles": [
         {
-          "alias": "prometheus",
+          "alias": "${datasource}",
           "align": "auto",
           "colorMode": null,
           "colors": [
@@ -1206,7 +1206,7 @@
           "type": "date"
         },
         {
-          "alias": "prometheus",
+          "alias": "${datasource}",
           "align": "auto",
           "colorMode": null,
           "colors": [
@@ -1225,7 +1225,7 @@
         {
           "expr": "topk(15, pihole_top_ads)",
           "instant": true,
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ domain }}",
           "refId": "A"
         }
@@ -1294,7 +1294,7 @@
       "targets": [
         {
           "expr": "pihole_forward_destinations{hostname=~'$node'}",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ destination }}",
           "refId": "A"
         }
@@ -1408,7 +1408,7 @@
       "targets": [
         {
           "expr": "pihole_unique_clients{hostname=~'$node'}",
-          "interval": "prometheus",
+          "interval": "${datasource}",
           "legendFormat": "{{ hostname }}",
           "refId": "A"
         }
@@ -1463,6 +1463,19 @@
   "templating": {
     "list": [
       {
+        "current": {},
+        "hide": 0,
+        "includeAll": false,
+        "label": "Data Source",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
         "allValue": null,
         "current": {
           "selected": false,
@@ -1479,12 +1492,12 @@
         "options": [],
         "query": "label_values(pihole_ads_blocked_today, hostname)",
         "refresh": 1,
-        "regex": "prometheus",
+        "regex": "${datasource}",
         "skipUrlSync": false,
         "sort": 0,
-        "tagValuesQuery": "prometheus",
+        "tagValuesQuery": "${datasource}",
         "tags": [],
-        "tagsQuery": "prometheus",
+        "tagsQuery": "${datasource}",
         "type": "query",
         "useTags": false
       }
@@ -1496,7 +1509,7 @@
   },
   "timepicker": {
     "hidden": false,
-    "nowDelay": "prometheus",
+    "nowDelay": "${datasource}",
     "refresh_intervals": [
       "5s",
       "10s",
@@ -1521,7 +1534,7 @@
       "30d"
     ]
   },
-  "timezone": "prometheus",
+  "timezone": "${datasource}",
   "title": "Pi-hole Exporter",
   "uid": "Pi-hole-Exporter",
   "version": 31
