@@ -24,23 +24,23 @@ data:
         hosts:
           - prometheus.lan
 
-      extraScrapeConfigs:
-        - job_name: forgejo
-          static_configs:
-            - targets:
-                - forgejo-http.forgejo.svc.cluster.local:3000
-          metrics_path: /metrics
+    extraScrapeConfigs:
+      - job_name: forgejo
+        static_configs:
+          - targets:
+              - forgejo-http.forgejo.svc.cluster.local:3000
+        metrics_path: /metrics
 
-        - job_name: pihole
-          kubernetes_sd_configs:
-            - role: pod
-              namespaces:
-                names: [pihole]
-          relabel_configs:
-            - source_labels: [__meta_kubernetes_pod_container_name]
-              regex: pihole-exporter
-              action: keep
-            - source_labels: [__meta_kubernetes_pod_ip]
-              action: replace
-              target_label: __address__
-              replacement: "$1:9617"
+      - job_name: pihole
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names: [pihole]
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_container_name]
+            regex: pihole-exporter
+            action: keep
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: __address__
+            replacement: "$1:9617"
