@@ -4,3 +4,5 @@ resources:
   - pihole
   - forgejo
   - n8n
+  - prometheus
+  - grafana

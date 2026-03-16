@@ -31,6 +31,8 @@ data:
       - address=/pihole.lan/192.168.1.205
       - address=/forgejo.lan/192.168.1.205
       - address=/n8n.lan/192.168.1.205
+      - address=/prometheus.lan/192.168.1.205
+      - address=/grafana.lan/192.168.1.205
 
     admin:
       existingSecret: pihole-admin-secret

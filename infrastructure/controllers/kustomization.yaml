@@ -8,3 +8,5 @@ resources:
   - sealed-secrets-helmrelease.yaml
   - forgejo-helmrepo.yaml
   - n8n-helmrepo.yaml
+  - prometheus-helmrepo.yaml
+  - grafana-helmrepo.yaml

@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-values
+  namespace: prometheus
+data:
+  values.yaml: |
+    alertmanager:
+      enabled: false
+
+    prometheus-pushgateway:
+      enabled: false
+
+    server:
+      retention: "7d"
+
+      persistentVolume:
+        enabled: true
+        storageClass: longhorn
+        size: 10Gi
+
+      ingress:
+        enabled: true
+        hosts:
+          - prometheus.lan

@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-values
+  namespace: grafana
+data:
+  values.yaml: |
+    persistence:
+      enabled: true
+      storageClassName: longhorn
+      size: 1Gi
+
+    datasources:
+      datasources.yaml:
+        apiVersion: 1
+        datasources:
+          - name: Prometheus
+            type: prometheus
+            url: http://prometheus-server.prometheus.svc.cluster.local
+            isDefault: true
+
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+          - name: default
+            orgId: 1
+            folder: ""
+            type: file
+            disableDeletion: false
+            options:
+              path: /var/lib/grafana/dashboards/default
+
+    dashboards:
+      default:
+        node-exporter-full:
+          gnetId: 1860
+          revision: 37
+          datasource: Prometheus
+        kubernetes-cluster:
+          gnetId: 7249
+          revision: 1
+          datasource: Prometheus
+
+    ingress:
+      enabled: true
+      hosts:
+        - grafana.lan
