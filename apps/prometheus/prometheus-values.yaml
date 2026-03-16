@@ -24,7 +24,7 @@ data:
         hosts:
           - prometheus.lan
 
-    extraScrapeConfigs:
+    extraScrapeConfigs: |
       - job_name: forgejo
         static_configs:
           - targets:
