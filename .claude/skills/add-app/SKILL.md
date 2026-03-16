@@ -92,6 +92,8 @@ spec:
 
 Semver range conventions used in this project: `"16.x"` (major pinned), `"2.x"` (major pinned), `"1.8.x"` (major+minor pinned).
 
+**Finding the current major version:** Check the chart's GitHub releases page (e.g. `https://github.com/grafana/helm-charts/releases?q=grafana-`) or ArtifactHub. The chart version and the app version are often different — use the chart version for the semver range. Known versions as of 2026-03: `prometheus-community/prometheus` → `28.x`, `grafana/grafana` → `10.x`.
+
 ---
 
 ### Step 4 — Values ConfigMap
@@ -115,14 +117,9 @@ The data key **must** be exactly `values.yaml:`. Sensitive values (passwords, AP
 
 ### Step 5 — Sealed Secret (only if sensitive values needed)
 
-Run:
-```bash
-kubectl create secret generic <name>-secret-values \
-  -n <name> \
-  --dry-run=client \
-  -o yaml \
-  | kubeseal -o yaml > apps/<name>/<name>-sealed-secret.yaml
-```
+**Invoke the `seal-secret` skill** — do not run kubeseal locally. The cluster cert is only accessible server-side and the `johan` user requires `KUBECONFIG=/home/johan/.kube/config` for kubectl. The seal-secret skill handles all of this correctly.
+
+The secret name must be `<name>-secret-values` and live in the `<name>` namespace. Its `values.yaml` key contains the sensitive Helm values that would otherwise go in the ConfigMap.
 
 Then add to HelmRelease `valuesFrom`:
 ```yaml

@@ -37,3 +37,7 @@ data:
     admin:
       existingSecret: pihole-admin-secret
       passwordKey: password
+
+    monitoring:
+      sidecar:
+        enabled: true

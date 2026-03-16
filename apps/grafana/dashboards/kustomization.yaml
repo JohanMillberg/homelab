@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: grafana
+
+generatorOptions:
+  disableNameSuffixHash: true
+  labels:
+    grafana_dashboard: "1"
+
+configMapGenerator:
+  - name: grafana-dashboard-k3s-nodes
+    files:
+      - k3s-nodes.json
+  - name: grafana-dashboard-kubernetes-overview
+    files:
+      - kubernetes-overview.json
+  - name: grafana-dashboard-pihole
+    files:
+      - pihole.json
+  - name: grafana-dashboard-forgejo
+    files:
+      - forgejo.json
+  - name: grafana-dashboard-n8n
+    files:
+      - n8n.json
