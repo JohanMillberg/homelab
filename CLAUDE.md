@@ -43,6 +43,7 @@ flux reconcile kustomization infrastructure-controllers --with-source
 | n8n | n8n | OCI `8gears.container-registry.com/library` |
 | grafana | grafana | grafana (HTTP, grafana.github.io/helm-charts) |
 | prometheus | prometheus | prometheus-community (HTTP) |
+| plan-assistant | plan-assistant | Raw manifests (FastAPI + Vue.js + PostgreSQL) — image: `forgejo.lan/kvarnberg/plan-assistant-{backend,frontend}` |
 
 Infrastructure: longhorn (storage), sealed-secrets (secret encryption).
 
@@ -64,7 +65,8 @@ Infrastructure: longhorn (storage), sealed-secrets (secret encryption).
 
 Use the skills in `.claude/skills/` for common tasks:
 
-- **`add-app`** — scaffold a complete new app (HelmRepo → HelmRelease → values → kustomization wiring)
+- **`add-app`** — scaffold a complete new app (HelmRepo → HelmRelease → values → kustomization wiring) — Helm-based only
+- **`deploy-raw-app`** — deploy a non-Helm app with raw Kubernetes manifests and self-built Docker images pushed to Forgejo
 - **`upgrade-app`** — upgrade a chart version or pinned image tag
 - **`seal-secret`** — create, update, or verify a SealedSecret (Claude runs kubeseal on the server)
 - **`debug-flux`** — diagnose and fix stuck HelmReleases (Claude SSHes in and applies fixes)
