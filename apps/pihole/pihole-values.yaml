@@ -33,6 +33,7 @@ data:
       - address=/n8n.lan/192.168.1.205
       - address=/prometheus.lan/192.168.1.205
       - address=/grafana.lan/192.168.1.205
+      - address=/plan-assistant.lan/192.168.1.205
 
     admin:
       existingSecret: pihole-admin-secret
