@@ -4,6 +4,6 @@ metadata:
   name: plan-assistant-config
   namespace: plan-assistant
 data:
-  DATABASE_URL: "postgresql+asyncpg://planassistant@plan-assistant-postgres:5432/planassistant"
+  # DATABASE_URL is intentionally omitted here — the full URL (with password) is in the SealedSecret
   CORS_ORIGINS: "http://plan-assistant.lan"
   OAUTH_REDIRECT_URI: "http://plan-assistant.lan/api/auth/callback"

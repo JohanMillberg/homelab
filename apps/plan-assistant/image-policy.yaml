@@ -44,7 +44,7 @@ spec:
     pattern: "^main-[a-f0-9]+"
   policy:
     alphabetical:
-      order: asc
+      order: desc
 ---
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImagePolicy
@@ -58,4 +58,4 @@ spec:
     pattern: "^main-[a-f0-9]+"
   policy:
     alphabetical:
-      order: asc
+      order: desc
