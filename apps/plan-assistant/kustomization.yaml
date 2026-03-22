@@ -9,7 +9,5 @@ resources:
   - backend-deployment.yaml
   - frontend-deployment.yaml
   - ingress.yaml
-  - image-policy.yaml
-  - image-update-automation.yaml
   - plan-assistant-sealed-secret.yaml
   - registry-sealed-secret.yaml
