@@ -1,0 +1,61 @@
+# Flux Image Automation — ImageRepository + ImagePolicy
+#
+# These resources tell Flux to poll the Forgejo container registry for new
+# image tags and update the backend/frontend Deployments automatically.
+#
+# The ImageRepository resources need read access to forgejo.lan.
+# Ensure the forgejo-registry-secret exists in the plan-assistant namespace
+# before Flux attempts to reconcile these (see registry-secret-instructions.md).
+#
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: plan-assistant-backend
+  namespace: plan-assistant
+spec:
+  image: forgejo.lan/kvarnberg/plan-assistant-backend
+  # Poll every 5 minutes for new tags
+  interval: 5m
+  secretRef:
+    name: forgejo-registry-secret
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: plan-assistant-frontend
+  namespace: plan-assistant
+spec:
+  image: forgejo.lan/kvarnberg/plan-assistant-frontend
+  interval: 5m
+  secretRef:
+    name: forgejo-registry-secret
+---
+# Select the latest main-* tag (alphabetical descending = latest SHA wins)
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: backend-image-policy
+  namespace: plan-assistant
+spec:
+  imageRepositoryRef:
+    name: plan-assistant-backend
+  filterTags:
+    pattern: "^main-[a-f0-9]+"
+  policy:
+    alphabetical:
+      order: asc
+---
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: frontend-image-policy
+  namespace: plan-assistant
+spec:
+  imageRepositoryRef:
+    name: plan-assistant-frontend
+  filterTags:
+    pattern: "^main-[a-f0-9]+"
+  policy:
+    alphabetical:
+      order: asc

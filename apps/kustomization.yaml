@@ -6,3 +6,4 @@ resources:
   - n8n
   - prometheus
   - grafana
+  - plan-assistant

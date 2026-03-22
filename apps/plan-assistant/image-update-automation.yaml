@@ -1,0 +1,38 @@
+# Flux ImageUpdateAutomation
+#
+# When Flux detects a new image tag matching an ImagePolicy, it automatically
+# updates the image reference in the git repo and pushes a commit.
+# Flux then reconciles the updated manifests, triggering a rolling restart.
+#
+# This resource lives in flux-system so it can use the bootstrap GitRepository
+# (which already has write access to the homelab repo via the deploy key).
+#
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: plan-assistant
+  namespace: flux-system
+spec:
+  interval: 5m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        name: Flux
+        email: flux@homelab
+      messageTemplate: |
+        chore: update plan-assistant images
+
+        {{range .Updated.Images -}}
+        - {{.}} updated to {{.NewTag}}
+        {{end -}}
+    push:
+      branch: main
+  update:
+    strategy: Setters
+    path: ./apps/plan-assistant

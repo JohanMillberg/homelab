@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: plan-assistant
+  namespace: plan-assistant
+  annotations:
+    # Ensure /api prefix is forwarded to the backend as-is
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  rules:
+    - host: plan-assistant.lan
+      http:
+        paths:
+          # API and health endpoints → backend
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: plan-assistant-backend
+                port:
+                  number: 8000
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: plan-assistant-backend
+                port:
+                  number: 8000
+          - path: /ready
+            pathType: Exact
+            backend:
+              service:
+                name: plan-assistant-backend
+                port:
+                  number: 8000
+          # Everything else → frontend SPA
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: plan-assistant-frontend
+                port:
+                  number: 80

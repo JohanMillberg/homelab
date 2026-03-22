@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plan-assistant-config
+  namespace: plan-assistant
+data:
+  DATABASE_URL: "postgresql+asyncpg://planassistant@plan-assistant-postgres:5432/planassistant"
+  CORS_ORIGINS: "http://plan-assistant.lan"
+  OAUTH_REDIRECT_URI: "http://plan-assistant.lan/api/auth/callback"

@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plan-assistant-backend
+  namespace: plan-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plan-assistant-backend
+  template:
+    metadata:
+      labels:
+        app: plan-assistant-backend
+    spec:
+      imagePullSecrets:
+        - name: forgejo-registry-secret
+      initContainers:
+        # Step 1: wait for PostgreSQL to accept connections
+        - name: wait-for-postgres
+          image: postgres:16-alpine
+          command:
+            - sh
+            - -c
+            - |
+              until pg_isready -h plan-assistant-postgres -U $POSTGRES_USER -d $POSTGRES_DB; do
+                echo "Waiting for PostgreSQL..."
+                sleep 2
+              done
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: plan-assistant-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: plan-assistant-secret
+                  key: POSTGRES_DB
+        # Step 2: run Alembic migrations (supports asyncpg natively)
+        - name: migrate
+          image: forgejo.lan/kvarnberg/plan-assistant-backend:main-4f691e5 # {"$imagepolicy": "plan-assistant:backend-image-policy"}
+          command: ["alembic", "upgrade", "head"]
+          envFrom:
+            - configMapRef:
+                name: plan-assistant-config
+            - secretRef:
+                name: plan-assistant-secret
+      containers:
+        - name: backend
+          image: forgejo.lan/kvarnberg/plan-assistant-backend:main-4f691e5 # {"$imagepolicy": "plan-assistant:backend-image-policy"}
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: plan-assistant-config
+            - secretRef:
+                name: plan-assistant-secret
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"

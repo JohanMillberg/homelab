@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plan-assistant-frontend
+  namespace: plan-assistant
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plan-assistant-frontend
+  template:
+    metadata:
+      labels:
+        app: plan-assistant-frontend
+    spec:
+      imagePullSecrets:
+        - name: forgejo-registry-secret
+      containers:
+        - name: frontend
+          image: forgejo.lan/kvarnberg/plan-assistant-frontend:main-4f691e5 # {"$imagepolicy": "plan-assistant:frontend-image-policy"}
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            # Override the baked-in nginx.conf with one that serves static
+            # files only — /api routing is handled by the Traefik ingress.
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          resources:
+            requests:
+              memory: "32Mi"
+              cpu: "10m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: frontend-nginx-config
