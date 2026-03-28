@@ -15,6 +15,10 @@ spec:
     spec:
       securityContext:
         fsGroup: 1000
+      hostAliases:
+        - ip: "192.168.1.205"
+          hostnames:
+            - "forgejo.lan"
       initContainers:
         # Register the runner on first start (no-op if already registered)
         - name: register
@@ -88,6 +92,9 @@ spec:
           volumeMounts:
             - name: docker-storage
               mountPath: /var/lib/docker
+            - name: docker-daemon-config
+              mountPath: /etc/docker/daemon.json
+              subPath: daemon.json
           resources:
             requests:
               memory: "256Mi"
@@ -102,3 +109,6 @@ spec:
             claimName: act-runner-data
         - name: docker-storage
           emptyDir: {}
+        - name: docker-daemon-config
+          configMap:
+            name: docker-daemon-config

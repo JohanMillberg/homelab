@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: docker-daemon-config
+  namespace: act-runner
+data:
+  daemon.json: |
+    {
+      "insecure-registries": ["forgejo.lan"]
+    }
