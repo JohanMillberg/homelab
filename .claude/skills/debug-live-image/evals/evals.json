@@ -1,0 +1,23 @@
+{
+  "skill_name": "debug-live-image",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The act-runner pod in the act-runner namespace is stuck in Init:0/1 — it's been like this for several minutes. Figure out what's wrong and fix it.",
+      "expected_output": "Claude SSHes to the cluster, describes the pod to read Events, fetches init container logs, identifies the root cause (image still pulling, registration failure, etc.), and either waits/retries or applies a fix.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "plan-assistant-backend is in CrashLoopBackOff after I pushed a new image. The pod is in the plan-assistant namespace. Help me figure out what's wrong.",
+      "expected_output": "Claude fetches --previous logs (not just current), identifies the crash cause (missing env var, import error, DB connection, startup exception), and suggests the fix targeting the specific error.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "I deployed a new frontend image but the pod shows 0/1 Ready and has been Running for 3 minutes. The readiness probe seems to be failing. What's going on?",
+      "expected_output": "Claude checks the readiness probe config via describe, tails app logs during startup, identifies whether it's a slow start, wrong path/port, or runtime error, and recommends adjusting initialDelaySeconds or fixing the app.",
+      "files": []
+    }
+  ]
+}
