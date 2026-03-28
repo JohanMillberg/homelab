@@ -1,0 +1,12 @@
+{
+  "skill_name": "add-app",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "add-app-vaultwarden",
+      "prompt": "I want to deploy Vaultwarden to my homelab. It's a self-hosted Bitwarden-compatible password manager. The Helm chart is available as an OCI chart: registry `oci://ghcr.io/gabe565/charts`, chart name `vaultwarden`. I don't need any secrets configured yet — just get the basic deployment scaffolded.",
+      "expected_output": "All 5 required files created (namespace.yaml, helmrelease.yaml, values.yaml, app kustomization.yaml, and updates to apps/kustomization.yaml and infrastructure/controllers/kustomization.yaml with the new HelmRepository), using correct apiVersion and OCI HelmRepository type.",
+      "files": []
+    }
+  ]
+}

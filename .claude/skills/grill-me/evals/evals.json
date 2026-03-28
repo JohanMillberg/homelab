@@ -1,0 +1,12 @@
+{
+  "skill_name": "grill-me",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "grill-me-nextcloud",
+      "prompt": "I want to add Nextcloud to my homelab. Grill me on the plan.",
+      "expected_output": "Claude explores the codebase before asking questions, then conducts a structured interview covering: deployment approach (Helm vs raw), persistence/database, secrets, DNS, failure modes, and observability. Asks one focused question at a time.",
+      "files": []
+    }
+  ]
+}

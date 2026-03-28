@@ -1,6 +1,6 @@
 ---
 name: add-app
-description: Use when adding a new application to the homelab Flux CD GitOps setup, scaffolding Helm-based deployments with HelmRepository, HelmRelease, ConfigMap values, SealedSecrets, and kustomization wiring.
+description: Use when adding a new application to the homelab Flux CD GitOps setup. Always use this skill when the user says "add X", "deploy Y", "install Z", or "I want to run [app name]" — even without specifying the full workflow. Scaffolds HelmRepository, HelmRelease, ConfigMap values, SealedSecrets, and kustomization wiring in the correct order. Use this for Helm-based apps; for custom Docker images use deploy-raw-app instead.
 ---
 
 # add-app
@@ -92,7 +92,11 @@ spec:
 
 Semver range conventions used in this project: `"16.x"` (major pinned), `"2.x"` (major pinned), `"1.8.x"` (major+minor pinned).
 
-**Finding the current major version:** Check the chart's GitHub releases page (e.g. `https://github.com/grafana/helm-charts/releases?q=grafana-`) or ArtifactHub. The chart version and the app version are often different — use the chart version for the semver range. Known versions as of 2026-03: `prometheus-community/prometheus` → `28.x`, `grafana/grafana` → `10.x`.
+**Finding the current chart version:** After adding the HelmRepository and reconciling, run:
+```bash
+ssh johan@192.168.1.205 "KUBECONFIG=/home/johan/.kube/config helm search repo <repo>/<chart> --versions | head -5"
+```
+Or check ArtifactHub. The chart version and app version are often different — use the chart version for the semver range. Known versions as of 2026-03: `prometheus-community/prometheus` → `28.x`, `grafana/grafana` → `10.x`.
 
 ---
 
@@ -156,6 +160,22 @@ Add to `customDnsEntries` in `apps/pihole/pihole-values.yaml`:
 ```yaml
 - address=/<name>.lan/192.168.1.205
 ```
+
+---
+
+### Step 9 — Reconcile and verify
+
+```bash
+ssh johan@192.168.1.205 "KUBECONFIG=/home/johan/.kube/config flux reconcile kustomization infrastructure-controllers --with-source"
+ssh johan@192.168.1.205 "KUBECONFIG=/home/johan/.kube/config flux reconcile kustomization apps --with-source"
+```
+
+Wait ~60s then verify the HelmRelease is healthy:
+```bash
+ssh johan@192.168.1.205 "KUBECONFIG=/home/johan/.kube/config kubectl get helmrelease <name> -n <name>"
+```
+
+Expected: `READY: True`. If failing, invoke the `debug-flux` skill.
 
 ---
 

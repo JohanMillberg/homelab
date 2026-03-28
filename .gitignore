@@ -1,4 +1,6 @@
-.claude
+.claude/*
+!.claude/skills
+.claude/skills/evals-workspace
 
 # Secret templates — must be sealed with kubeseal before committing.
 # The sealed output (plan-assistant-sealed-secret.yaml, registry-sealed-secret.yaml) IS safe to commit.

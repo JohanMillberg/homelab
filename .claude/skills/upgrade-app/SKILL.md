@@ -1,6 +1,6 @@
 ---
 name: upgrade-app
-description: Use when upgrading a homelab app's Helm chart version, pinned image tag, or both — guides which file to edit, semver range conventions, and schema-change checks.
+description: Use when upgrading a homelab app's Helm chart version, pinned image tag, or both. Always use this skill when someone says "upgrade", "bump version", "update chart", "newer release", or mentions wanting a newer version of any app (forgejo, n8n, grafana, prometheus, pihole, etc.) — guides which file to edit, semver range conventions, and schema-change checks.
 ---
 
 # upgrade-app
@@ -54,6 +54,22 @@ data:
 
 ---
 
+## Reconcile
+
+After committing and pushing:
+```bash
+ssh johan@192.168.1.205 "KUBECONFIG=/home/johan/.kube/config flux reconcile kustomization apps --with-source"
+```
+
+Verify upgrade succeeded:
+```bash
+ssh johan@192.168.1.205 "KUBECONFIG=/home/johan/.kube/config kubectl get helmrelease <name> -n <name>"
+```
+
+Expected: `READY: True`, `STATUS: Release reconciliation succeeded`. If it fails, invoke the `debug-flux` skill.
+
+---
+
 ## Common Mistakes
 
 | Mistake | Fix |
@@ -62,4 +78,4 @@ data:
 | Editing the HelmRelease for an image tag bump | Image tag lives in `<name>-values.yaml` in the ConfigMap data block |
 | Pinning exact version when a semver range is appropriate | Use `"X.x"` ranges unless you have a specific reason to pin exactly |
 | Not checking values schema after a major chart bump | Values keys can change between major versions — reconciliation will fail silently |
-| Expecting immediate rollout after a commit | Flux reconciles on a 1h interval; force with `flux reconcile kustomization apps --with-source` |
+| Expecting immediate rollout after a commit | Flux polls every 1h; always force reconcile after pushing: `ssh johan@192.168.1.205 "KUBECONFIG=/home/johan/.kube/config flux reconcile kustomization apps --with-source"` |
