@@ -17,7 +17,7 @@ spec:
         - name: forgejo-registry-secret
       containers:
         - name: frontend
-          image: forgejo.lan/kvarnberg/plan-assistant-frontend:main-4f691e5 # {"$imagepolicy": "plan-assistant:frontend-image-policy"}
+          image: forgejo.lan/kvarnberg/plan-assistant-frontend:main-e86fedb # {"$imagepolicy": "plan-assistant:frontend-image-policy"}
           ports:
             - containerPort: 80
           volumeMounts:
