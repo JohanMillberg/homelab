@@ -13,6 +13,8 @@ spec:
       labels:
         app: act-runner
     spec:
+      securityContext:
+        fsGroup: 1000
       initContainers:
         # Register the runner on first start (no-op if already registered)
         - name: register
