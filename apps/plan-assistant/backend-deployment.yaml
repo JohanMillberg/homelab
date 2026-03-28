@@ -40,7 +40,7 @@ spec:
                   key: POSTGRES_DB
         # Step 2: run Alembic migrations (supports asyncpg natively)
         - name: migrate
-          image: forgejo.lan/kvarnberg/plan-assistant-backend:main-e86fedb # {"$imagepolicy": "plan-assistant:backend-image-policy"}
+          image: forgejo.lan/kvarnberg/plan-assistant-backend:main-8f92931 # {"$imagepolicy": "plan-assistant:backend-image-policy"}
           command: ["alembic", "upgrade", "head"]
           envFrom:
             - configMapRef:
@@ -49,7 +49,7 @@ spec:
                 name: plan-assistant-secret
       containers:
         - name: backend
-          image: forgejo.lan/kvarnberg/plan-assistant-backend:main-e86fedb # {"$imagepolicy": "plan-assistant:backend-image-policy"}
+          image: forgejo.lan/kvarnberg/plan-assistant-backend:main-8f92931 # {"$imagepolicy": "plan-assistant:backend-image-policy"}
           ports:
             - containerPort: 8000
           envFrom:
