@@ -25,6 +25,8 @@ spec:
             - |
               if [ ! -f /data/config.yaml ]; then
                 forgejo-runner generate-config > /data/config.yaml
+                # Use host networking for job containers so they can reach DinD at localhost:2375
+                sed -i 's|  docker_host: "-"|  docker_host: "tcp://localhost:2375"\n  network: "host"\n  privileged: true|' /data/config.yaml
               fi
               if [ ! -f /data/.runner ]; then
                 forgejo-runner register \
@@ -51,9 +53,7 @@ spec:
           command: ["forgejo-runner", "daemon", "--config", "/data/config.yaml"]
           env:
             - name: DOCKER_HOST
-              value: tcp://localhost:2376
-            - name: DOCKER_TLS_CERTDIR
-              value: ""
+              value: tcp://localhost:2375
           volumeMounts:
             - name: runner-data
               mountPath: /data
