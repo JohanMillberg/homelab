@@ -29,7 +29,7 @@ spec:
               if [ ! -f /data/.runner ]; then
                 forgejo-runner register \
                   --no-interactive \
-                  --instance http://forgejo.lan \
+                  --instance http://forgejo-http.forgejo.svc.cluster.local:3000 \
                   --token "$REGISTRATION_TOKEN" \
                   --name homelab-runner \
                   --labels self-hosted,linux,amd64 \
