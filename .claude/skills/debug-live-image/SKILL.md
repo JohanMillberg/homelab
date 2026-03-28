@@ -81,7 +81,7 @@ ssh johan@192.168.1.205 "KUBECONFIG=/home/johan/.kube/config \
 | `Waiting for PostgreSQL...` loops | Postgres not running or wrong hostname | `kubectl get pods -n <ns>` — check postgres pod; verify service name in ConfigMap |
 | `alembic` / `relation does not exist` | Missing initial migration (app used `create_all()` in dev) | Add a `down_revision=None` migration that creates base tables |
 | `connection refused` on startup | Dependency service not running or wrong URL | Check env vars in ConfigMap match actual service names |
-| `no such host: forgejo.lan` or DNS lookup failure | `.lan` hostname used inside a pod or init container | Use in-cluster URL: `http://forgejo-http.forgejo.svc.cluster.local:3000` |
+| `could not resolve host` / `Name or service not known` | `.lan` hostname used inside a pod — does not resolve in-cluster | Use in-cluster URL: `http://<service>.<namespace>.svc.cluster.local:<port>` — for Forgejo: `http://forgejo-http.forgejo.svc.cluster.local:3000` |
 | Pod pulling image — no logs yet | Still downloading; can be slow for large images | Wait and watch `kubectl describe pod` Events for pull progress |
 | `exec: <command> not found` | Wrong command in init container spec | Fix the `command:` in the Deployment manifest |
 
