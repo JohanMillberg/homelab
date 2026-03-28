@@ -21,6 +21,9 @@ spec:
             - sh
             - -c
             - |
+              if [ ! -f /data/config.yaml ]; then
+                forgejo-runner generate-config > /data/config.yaml
+              fi
               if [ ! -f /data/.runner ]; then
                 forgejo-runner register \
                   --no-interactive \
