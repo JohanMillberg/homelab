@@ -7,3 +7,4 @@ resources:
   - prometheus
   - grafana
   - plan-assistant
+  - act-runner
