@@ -6,4 +6,4 @@ metadata:
 data:
   # DATABASE_URL is intentionally omitted here — the full URL (with password) is in the SealedSecret
   CORS_ORIGINS: "http://plan-assistant.lan"
-  OAUTH_REDIRECT_URI: "http://plan-assistant.lan/api/auth/callback"
+  OAUTH_REDIRECT_URI: "http://plan-assistant.lan/callback"
