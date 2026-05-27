@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hermes
+  namespace: hermes
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hermes
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: hermes
+    spec:
+      initContainers:
+        - name: fix-data-permissions
+          image: busybox:1.36
+          command: ["sh", "-c", "chown -R 10000:10000 /opt/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /opt/data
+      containers:
+        - name: hermes
+          image: nousresearch/hermes-agent:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              chown -R 10000:10000 /opt/data
+              if [ -n "$HERMES_INFERENCE_PROVIDER" ]; then
+                su hermes -c "/opt/hermes/.venv/bin/hermes config set model.provider '$HERMES_INFERENCE_PROVIDER'"
+              fi
+              if [ -n "$HERMES_INFERENCE_MODEL" ]; then
+                su hermes -c "/opt/hermes/.venv/bin/hermes config set model.default '$HERMES_INFERENCE_MODEL'"
+              fi
+              exec /usr/bin/tini -g -- /opt/hermes/docker/entrypoint.sh gateway run
+          ports:
+            - name: api
+              containerPort: 8642
+          envFrom:
+            - configMapRef:
+                name: hermes-config
+            - secretRef:
+                name: hermes-secret
+          volumeMounts:
+            - name: data
+              mountPath: /opt/data
+          startupProbe:
+            httpGet:
+              path: /health
+              port: api
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: api
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: api
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: hermes-data

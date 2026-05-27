@@ -70,8 +70,11 @@ Use the skills in `.claude/skills/` for common tasks:
 - **`upgrade-app`** — upgrade a chart version or pinned image tag
 - **`seal-secret`** — create, update, or verify a SealedSecret (Claude runs kubeseal on the server)
 - **`debug-flux`** — diagnose and fix stuck HelmReleases (Claude SSHes in and applies fixes)
+- **`debug-live-image`** — debug failing pods after image or deployment updates
 - **`ssh-debug`** — full node-level triage via SSH (Claude runs diagnostics and fixes on the server)
 - **`manage-grafana-dashboards`** — add, update, or verify a Grafana dashboard (JSON → kustomization wiring → grafanactl verification)
+- **`grill-me`** — stress-test a homelab plan or design before committing to it
+- **`write-a-prd`** — create a PRD through interview, repo exploration, and issue drafting
 
 ## Sealed Secrets Workflow
 

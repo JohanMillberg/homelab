@@ -8,3 +8,4 @@ resources:
   - grafana
   - plan-assistant
   - act-runner
+  - hermes
