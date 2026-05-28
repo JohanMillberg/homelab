@@ -20,8 +20,8 @@ _Avoid_: Telegram bot, LAN chat
 The sealed Kubernetes secret that provides Hermes with messaging credentials and model-provider credentials.
 _Avoid_: Plain env file, ConfigMap credentials, committed token
 
-**Ollama Cloud Account**:
-The v1 model-provider account for Hermes, authenticated through an `OLLAMA_API_KEY` stored in the **Hermes Secret**.
+**OpenCode Go Account**:
+The v1 model-provider account for Hermes, authenticated through an `OPENCODE_GO_API_KEY` stored in the **Hermes Secret**.
 _Avoid_: Nous OAuth state, plaintext API key, ConfigMap credentials
 
 ## Relationships
@@ -30,14 +30,14 @@ _Avoid_: Nous OAuth state, plaintext API key, ConfigMap credentials
 - A **Hermes Gateway** connects to exactly one v1 **Discord Bot**.
 - A **Discord Bot** sends user messages to the **Hermes Gateway**.
 - A **Hermes Secret** supplies credentials to the **Hermes Gateway**.
-- An **Ollama Cloud Account** supplies model access to the **Hermes Gateway**.
+- An **OpenCode Go Account** supplies model access to the **Hermes Gateway**.
 
 ## Current State
 
 - Hermes v1 runs in the `hermes` namespace as a raw Kubernetes Deployment.
 - The **Hermes Gateway** uses the **Discord Bot** as the active **Remote Chat Surface**.
 - The **Discord Bot** is installed in a private Discord server and is allowlisted by numeric Discord user ID.
-- The **Hermes Gateway** is authenticated to the **Ollama Cloud Account** through `OLLAMA_API_KEY` in the **Hermes Secret**.
+- The **Hermes Gateway** is authenticated to the **OpenCode Go Account** through `OPENCODE_GO_API_KEY` in the **Hermes Secret**.
 - Hermes v1 pins its main model from Kubernetes config to `kimi-k2.6`, with the startup wrapper syncing that value into Hermes' persisted `config.yaml`.
 
 ## Example Dialogue
@@ -46,12 +46,12 @@ _Avoid_: Nous OAuth state, plaintext API key, ConfigMap credentials
 > **Domain expert:** "No - v1 needs a **Remote Chat Surface**, and that surface is the **Discord Bot**."
 > **Dev:** "Can I put the Telegram token in the ConfigMap while testing?"
 > **Domain expert:** "No - credentials belong in the **Hermes Secret**."
-> **Dev:** "Can I put the Ollama API key in the ConfigMap while testing?"
+> **Dev:** "Can I put the OpenCode Go API key in the ConfigMap while testing?"
 > **Domain expert:** "No - model-provider credentials belong in the **Hermes Secret**."
 
 ## Flagged Ambiguities
 
 - "Access Hermes remotely" could mean a public web UI, an API endpoint, or a messaging integration; resolved for v1 as a **Discord Bot** remote chat surface.
 - "Credentials" covers both the Telegram bot token and model-provider keys; resolved as **Hermes Secret** material, not ConfigMap data.
-- "Model provider" could mean a direct API key provider or a subscription provider; resolved for v1 as **Ollama Cloud Account**.
+- "Model provider" could mean a direct API key provider or a subscription provider; resolved for v1 as **OpenCode Go Account**.
 - "Messaging service" was initially resolved as Telegram, then changed because the user decided to delete Telegram; v1 is now Discord.
