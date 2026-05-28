@@ -23,3 +23,5 @@ spec:
   valuesFrom:
     - kind: ConfigMap
       name: forgejo-values
+    - kind: Secret
+      name: forgejo-secret-values

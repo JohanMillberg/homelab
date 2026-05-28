@@ -9,7 +9,6 @@ data:
     gitea:
       admin:
         username: johan
-        password: admin1234
       config:
         indexer:
           REPO_INDEXER_ENABLED: true

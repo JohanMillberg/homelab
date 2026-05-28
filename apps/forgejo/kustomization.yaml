@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - forgejo-helmrelease.yaml
   - forgejo-values.yaml
+  - forgejo-sealed-secret.yaml
   - namespace.yaml

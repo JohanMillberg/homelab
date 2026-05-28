@@ -18,7 +18,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: hermes
-              image: nousresearch/hermes-agent:latest
+              image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:
@@ -26,12 +26,16 @@ spec:
                 - configMapRef:
                     name: hermes-autonomy-config
                 - secretRef:
-                    name: hermes-secret
+                    name: hermes-discord-secret
+                - secretRef:
+                    name: hermes-model-secret
                 - secretRef:
                     name: hermes-github-app-secret
               env:
                 - name: HERMES_HOME
                   value: /opt/data
+                - name: HERMES_MAX_ITERATIONS
+                  value: "60"
               command:
                 - /bin/sh
                 - -c
@@ -50,6 +54,13 @@ spec:
                 - name: autonomy-scripts
                   mountPath: /opt/hermes-autonomy/scripts
                   readOnly: true
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
           volumes:
             - name: data
               persistentVolumeClaim:
@@ -81,7 +92,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: hermes
-              image: nousresearch/hermes-agent:latest
+              image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:
@@ -89,12 +100,16 @@ spec:
                 - configMapRef:
                     name: hermes-autonomy-config
                 - secretRef:
-                    name: hermes-secret
+                    name: hermes-discord-secret
+                - secretRef:
+                    name: hermes-model-secret
                 - secretRef:
                     name: hermes-github-app-secret
               env:
                 - name: HERMES_HOME
                   value: /opt/data
+                - name: HERMES_MAX_ITERATIONS
+                  value: "60"
               command:
                 - /bin/sh
                 - -c
@@ -113,6 +128,13 @@ spec:
                 - name: autonomy-scripts
                   mountPath: /opt/hermes-autonomy/scripts
                   readOnly: true
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
           volumes:
             - name: data
               persistentVolumeClaim:

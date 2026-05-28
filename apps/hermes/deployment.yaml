@@ -24,24 +24,37 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /opt/data
-      containers:
-        - name: hermes
-          image: nousresearch/hermes-agent:latest
+        - name: configure-hermes
+          image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
             - |
+              set -eu
               chown -R 10000:10000 /opt/data
-              if [ -n "$HERMES_INFERENCE_PROVIDER" ]; then
+              if [ -n "${HERMES_INFERENCE_PROVIDER:-}" ]; then
                 su hermes -c "/opt/hermes/.venv/bin/hermes config set model.provider '$HERMES_INFERENCE_PROVIDER'"
               fi
-              if [ -n "$HERMES_INFERENCE_MODEL" ]; then
+              if [ -n "${HERMES_INFERENCE_MODEL:-}" ]; then
                 su hermes -c "/opt/hermes/.venv/bin/hermes config set model.default '$HERMES_INFERENCE_MODEL'"
               fi
-              if [ -n "$HERMES_INFERENCE_BASE_URL" ]; then
+              if [ -n "${HERMES_INFERENCE_BASE_URL:-}" ]; then
                 su hermes -c "/opt/hermes/.venv/bin/hermes config set model.base_url '$HERMES_INFERENCE_BASE_URL'"
               fi
-              exec /usr/bin/tini -g -- /opt/hermes/docker/entrypoint.sh gateway run
+          envFrom:
+            - configMapRef:
+                name: hermes-config
+          env:
+            - name: HERMES_HOME
+              value: /opt/data
+          volumeMounts:
+            - name: data
+              mountPath: /opt/data
+      containers:
+        - name: hermes
+          image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+          imagePullPolicy: IfNotPresent
+          args: ["gateway", "run"]
           ports:
             - name: api
               containerPort: 8642
@@ -49,7 +62,14 @@ spec:
             - configMapRef:
                 name: hermes-config
             - secretRef:
-                name: hermes-secret
+                name: hermes-api-secret
+            - secretRef:
+                name: hermes-discord-secret
+            - secretRef:
+                name: hermes-model-secret
+          env:
+            - name: HERMES_HOME
+              value: /opt/data
           volumeMounts:
             - name: data
               mountPath: /opt/data

@@ -5,13 +5,16 @@ metadata:
   namespace: hermes
 data:
   autonomy_trigger.py: |
+    import base64
     import json
     import os
+    import re
     import socket
     import subprocess
     import sys
     import threading
     import time
+    import textwrap
     import uuid
     from datetime import datetime, timedelta, timezone
     from pathlib import Path
@@ -94,6 +97,24 @@ data:
         return request_json("GET", f"{GITHUB_API}{path}", headers=github_headers(token))
 
 
+    def github_request(token, method, path, ok_404=False, **kwargs):
+        response = requests.request(
+            method,
+            f"{GITHUB_API}{path}",
+            headers=github_headers(token),
+            timeout=30,
+            **kwargs,
+        )
+        if ok_404 and response.status_code == 404:
+            return None
+        if response.status_code >= 400:
+            body = response.text[:800]
+            raise RuntimeError(f"{method} {path} failed with {response.status_code}: {body}")
+        if response.status_code == 204 or not response.text:
+            return None
+        return response.json()
+
+
     def github_paginate(token, path):
         page = 1
         items = []
@@ -110,6 +131,332 @@ data:
             if len(batch) < 100:
                 return items
             page += 1
+
+
+    WORK_LABELS = {
+        "hermes-ready": "0E8A16",
+        "hermes-clarifying": "D93F0B",
+        "hermes-working": "1D76DB",
+        "hermes-review": "8250DF",
+        "hermes-blocked": "B60205",
+        "hermes-done": "59636E",
+    }
+
+    WORK_TICKET_TEMPLATE = textwrap.dedent("""\
+        ---
+        name: Hermes work ticket
+        about: Request autonomous Hermes implementation work
+        title: ""
+        labels: ""
+        assignees: ""
+        ---
+
+        ## Intent
+
+        ## Target repository
+
+        ## New repository
+
+        ## Goal
+
+        ## Acceptance criteria
+
+        ## Constraints
+
+        ## Notes
+    """)
+
+
+    def work_queue_slug():
+        return f"{env('HERMES_GITHUB_ORG')}/{env('HERMES_GITHUB_WORK_QUEUE_REPO')}"
+
+
+    def ensure_work_queue(token):
+        org = env("HERMES_GITHUB_ORG")
+        repo = env("HERMES_GITHUB_WORK_QUEUE_REPO")
+        slug = f"{org}/{repo}"
+        existing = github_request(token, "GET", f"/repos/{slug}", ok_404=True)
+        if existing is None:
+            github_request(
+                token,
+                "POST",
+                f"/orgs/{org}/repos",
+                json={"name": repo, "private": True, "auto_init": True},
+            )
+
+        labels = github_paginate(token, f"/repos/{slug}/labels")
+        existing_labels = {label.get("name") for label in labels}
+        for label, color in WORK_LABELS.items():
+            if label not in existing_labels:
+                github_request(
+                    token,
+                    "POST",
+                    f"/repos/{slug}/labels",
+                    json={"name": label, "color": color, "description": "Hermes autonomy workflow state"},
+                )
+
+        template_path = ".github/ISSUE_TEMPLATE/work-ticket.md"
+        current = github_request(
+            token,
+            "GET",
+            f"/repos/{slug}/contents/{template_path}",
+            ok_404=True,
+        )
+        desired = WORK_TICKET_TEMPLATE.strip() + "\n"
+        encoded = base64.b64encode(desired.encode()).decode()
+        if current is None:
+            github_request(
+                token,
+                "PUT",
+                f"/repos/{slug}/contents/{template_path}",
+                json={
+                    "message": "Add Hermes work ticket template",
+                    "content": encoded,
+                },
+            )
+        else:
+            current_content = base64.b64decode(current.get("content", "")).decode(errors="replace")
+            if current_content != desired:
+                github_request(
+                    token,
+                    "PUT",
+                    f"/repos/{slug}/contents/{template_path}",
+                    json={
+                        "message": "Update Hermes work ticket template",
+                        "content": encoded,
+                        "sha": current["sha"],
+                    },
+                )
+
+
+    def add_issue_label(token, repository, issue_number, label):
+        github_request(
+            token,
+            "POST",
+            f"/repos/{repository}/issues/{issue_number}/labels",
+            json={"labels": [label]},
+        )
+
+
+    def remove_issue_label(token, repository, issue_number, label):
+        github_request(
+            token,
+            "DELETE",
+            f"/repos/{repository}/issues/{issue_number}/labels/{label}",
+            ok_404=True,
+        )
+
+
+    def comment_issue(token, repository, issue_number, body):
+        github_request(
+            token,
+            "POST",
+            f"/repos/{repository}/issues/{issue_number}/comments",
+            json={"body": body},
+        )
+
+
+    def extract_issue_sections(body):
+        sections = {}
+        current = None
+        current_lines = []
+        for line in (body or "").splitlines():
+            match = re.match(r"^#{1,6}\s+(.+?)\s*$", line)
+            if match:
+                if current is not None:
+                    sections[current] = "\n".join(current_lines).strip()
+                current = match.group(1).strip().lower()
+                current_lines = []
+            elif current is not None:
+                current_lines.append(line)
+        if current is not None:
+            sections[current] = "\n".join(current_lines).strip()
+        return sections
+
+
+    def section_value(sections, name):
+        return sections.get(name.lower(), "").strip()
+
+
+    def validate_work_issue(issue):
+        sections = extract_issue_sections(issue.get("body") or "")
+        missing = []
+        for name in ("intent", "goal", "acceptance criteria", "constraints", "notes"):
+            if name not in sections:
+                missing.append(f"missing section `{name.title()}`")
+        target = section_value(sections, "target repository")
+        new_repo = section_value(sections, "new repository")
+        if "target repository" not in sections and "new repository" not in sections:
+            missing.append("missing section `Target repository` or `New repository`")
+        if not target and not new_repo:
+            missing.append("either `Target repository` or `New repository` must be filled")
+        for name in ("intent", "goal", "acceptance criteria"):
+            if name in sections and not section_value(sections, name):
+                missing.append(f"`{name.title()}` must not be empty")
+
+        org = env("HERMES_GITHUB_ORG")
+        if target and "/" in target and not target.startswith(f"{org}/"):
+            missing.append(f"`Target repository` must be under `{org}` for v1")
+        if new_repo and "/" in new_repo and not new_repo.startswith(f"{org}/"):
+            missing.append(f"`New repository` must be under `{org}` for v1")
+
+        return missing
+
+
+    def clarify_invalid_issue(token, repository, issue, missing):
+        issue_number = issue["number"]
+        details = "\n".join(f"- {item}" for item in missing)
+        comment_issue(
+            token,
+            repository,
+            issue_number,
+            "Hermes cannot start this ticket yet because the readiness gate failed:\n\n"
+            f"{details}\n\n"
+            "Please update the issue and re-apply `hermes-ready` when it is ready.",
+        )
+        add_issue_label(token, repository, issue_number, "hermes-clarifying")
+        remove_issue_label(token, repository, issue_number, "hermes-ready")
+        remove_issue_label(token, repository, issue_number, "hermes-working")
+
+
+    def load_json_file(path, default):
+        if not path.exists():
+            return default
+        return json.loads(path.read_text())
+
+
+    def write_json_file(path, payload):
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(payload, indent=2, sort_keys=True))
+        tmp.replace(path)
+
+
+    def queue_attempt_paths():
+        root = state_root()
+        return root / "queue-active-run.json", root / "queue-timeouts.json"
+
+
+    def selection_key(selection):
+        if selection.get("kind") == "active_pr":
+            return f"{selection['repository']}#pr-{selection['pull_request']}"
+        return f"{selection['repository']}#issue-{selection['issue_number']}"
+
+
+    def record_stale_queue_attempt(token):
+        active_path, timeouts_path = queue_attempt_paths()
+        if not active_path.exists():
+            return
+        active = load_json_file(active_path, {})
+        started_at = parse_kube_time(active.get("started_at"))
+        deadline = int(env("HERMES_QUEUE_ACTIVE_DEADLINE_SECONDS", "2700"))
+        if started_at is None or now_utc() <= started_at + timedelta(seconds=deadline):
+            return
+
+        key = active.get("key")
+        timeouts = load_json_file(timeouts_path, {})
+        timeouts[key] = int(timeouts.get(key, 0)) + 1
+        write_json_file(timeouts_path, timeouts)
+        active_path.unlink(missing_ok=True)
+
+        if timeouts[key] >= 3 and active.get("repository") and active.get("issue_number"):
+            repository = active["repository"]
+            issue_number = int(active["issue_number"])
+            comment_issue(
+                token,
+                repository,
+                issue_number,
+                "Hermes is blocking this ticket after three consecutive scheduled-run timeouts.",
+            )
+            add_issue_label(token, repository, issue_number, "hermes-blocked")
+            remove_issue_label(token, repository, issue_number, "hermes-working")
+
+
+    def mark_queue_run(selection):
+        active_path, _timeouts_path = queue_attempt_paths()
+        payload = dict(selection)
+        payload["key"] = selection_key(selection)
+        payload["started_at"] = kube_time(now_utc())
+        write_json_file(active_path, payload)
+
+
+    def finish_queue_run(selection, exit_code):
+        active_path, timeouts_path = queue_attempt_paths()
+        active_path.unlink(missing_ok=True)
+        if exit_code == 0:
+            timeouts = load_json_file(timeouts_path, {})
+            timeouts.pop(selection_key(selection), None)
+            write_json_file(timeouts_path, timeouts)
+
+
+    def active_implementation_pr(token):
+        org = env("HERMES_GITHUB_ORG")
+        candidates = []
+        for repo in installation_repositories(token):
+            owner = (repo.get("owner") or {}).get("login")
+            name = repo.get("name")
+            if owner != org or not name:
+                continue
+            repository = f"{owner}/{name}"
+            for pr in github_paginate(token, f"/repos/{repository}/pulls?state=open"):
+                head = pr.get("head") or {}
+                if str(head.get("ref", "")).startswith("hermes/issue-"):
+                    candidates.append(
+                        {
+                            "kind": "active_pr",
+                            "repository": repository,
+                            "pull_request": pr["number"],
+                            "html_url": pr.get("html_url"),
+                            "head_ref": head.get("ref"),
+                            "created_at": pr.get("created_at"),
+                        }
+                    )
+        candidates.sort(key=lambda item: item.get("created_at") or "")
+        return candidates[0] if candidates else None
+
+
+    def ready_work_issue(token):
+        repository = work_queue_slug()
+        author = env("HERMES_WORK_AUTHOR")
+        label = env("HERMES_WORK_READY_LABEL", "hermes-ready")
+        issues = github_paginate(
+            token,
+            f"/repos/{repository}/issues?state=open&labels={label}&sort=created&direction=asc",
+        )
+        for issue in issues:
+            if issue.get("pull_request"):
+                continue
+            if (issue.get("user") or {}).get("login") != author:
+                continue
+            missing = validate_work_issue(issue)
+            if missing:
+                clarify_invalid_issue(token, repository, issue, missing)
+                continue
+            return {
+                "kind": "ready_issue",
+                "repository": repository,
+                "issue_number": issue["number"],
+                "html_url": issue.get("html_url"),
+                "title": issue.get("title"),
+                "created_at": issue.get("created_at"),
+                "body": issue.get("body") or "",
+            }
+        return None
+
+
+    def queue_preflight():
+        token = github_installation_token()
+        ensure_work_queue(token)
+        record_stale_queue_attempt(token)
+        active = active_implementation_pr(token)
+        if active:
+            print(f"selected active Hermes PR {active['repository']}#{active['pull_request']}")
+            return active
+        issue = ready_work_issue(token)
+        if issue:
+            print(f"selected ready issue {issue['repository']}#{issue['issue_number']}")
+            return issue
+        print("no valid ready work items found")
+        return None
 
 
     class LeaseLock:
@@ -331,7 +678,7 @@ data:
         print(f"removed duplicate Hermes internal cron job(s): {', '.join(map(str, removed))}")
 
 
-    def run_hermes(prompt, event_path=None):
+    def run_hermes(prompt, event_path=None, extra_payload=None):
         token = github_installation_token()
         run_env = os.environ.copy()
         run_env["GITHUB_TOKEN"] = token
@@ -343,11 +690,15 @@ data:
         if event_path:
             event = Path(event_path).read_text()
             prompt = f"{prompt}\n\nReview event JSON:\n```json\n{event}\n```\n"
+        if extra_payload is not None:
+            payload = json.dumps(extra_payload, indent=2, sort_keys=True)
+            prompt = f"{prompt}\n\nSelected work item JSON:\n```json\n{payload}\n```\n"
 
         root = Path(env("HERMES_AUTONOMY_ROOT", "/opt/data/hermes-autonomy"))
         root.mkdir(parents=True, exist_ok=True)
         hermes_bin = env("HERMES_BIN", "/opt/hermes/.venv/bin/hermes")
-        command = [hermes_bin, "chat", "-Q", "-q", prompt]
+        max_turns = env("HERMES_MAX_ITERATIONS", "60")
+        command = [hermes_bin, "chat", "--max-turns", max_turns, "-Q", "-q", prompt]
         cleanup_internal_cron_jobs()
         try:
             return subprocess.run(command, cwd=str(root), env=run_env).returncode
@@ -376,9 +727,19 @@ data:
 
 
     def queue_mode():
+        selection = queue_preflight()
+        if selection is None:
+            return 0
+
         def work():
             enforce_disk_policy()
-            return run_hermes(prompt_text(env("HERMES_QUEUE_PROMPT_PATH")))
+            mark_queue_run(selection)
+            code = run_hermes(
+                prompt_text(env("HERMES_QUEUE_PROMPT_PATH")),
+                extra_payload={"selected_work": selection},
+            )
+            finish_queue_run(selection, code)
+            return code
 
         return with_lease(work)
 

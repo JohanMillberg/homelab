@@ -8,9 +8,12 @@ resources:
   - autonomy-scripts-configmap.yaml
   - serviceaccount.yaml
   - rbac.yaml
+  - networkpolicy.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml
-  - hermes-sealed-secret.yaml
+  - hermes-api-sealed-secret.yaml
+  - hermes-discord-sealed-secret.yaml
+  - hermes-model-sealed-secret.yaml
   - hermes-github-app-sealed-secret.yaml
   - autonomy-cronjobs.yaml
