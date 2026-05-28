@@ -15,7 +15,7 @@ spec:
       labels:
         app: hermes
       annotations:
-        hermes.kvarnberg.io/config-generation: "opencode-go-2026-05-28"
+        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-flash-2026-05-28"
     spec:
       initContainers:
         - name: fix-data-permissions

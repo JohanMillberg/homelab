@@ -38,7 +38,7 @@ _Avoid_: Nous OAuth state, plaintext API key, ConfigMap credentials
 - The **Hermes Gateway** uses the **Discord Bot** as the active **Remote Chat Surface**.
 - The **Discord Bot** is installed in a private Discord server and is allowlisted by numeric Discord user ID.
 - The **Hermes Gateway** is authenticated to the **OpenCode Go Account** through `OPENCODE_GO_API_KEY` in the **Hermes Secret**.
-- Hermes v1 pins its main model from Kubernetes config to `kimi-k2.6`, with the startup wrapper syncing that value into Hermes' persisted `config.yaml`.
+- Hermes v1 pins its main model from Kubernetes config to `deepseek-v4-flash`, with the startup wrapper syncing that value into Hermes' persisted `config.yaml`.
 
 ## Example Dialogue
 
