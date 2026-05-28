@@ -9,8 +9,8 @@ data:
 
     Kubernetes scheduling:
     - This process is already started by Kubernetes CronJob `hermes-autonomy-queue`.
-    - Do not create, edit, resume, or rely on Hermes internal cron jobs, `/cron`, `hermes cron`, or cronjob tools.
-    - Do not report that a Hermes internal cron job was created or is active.
+    - Do not create a Hermes internal cron job to schedule this work-queue scan; Kubernetes already owns that scheduler.
+    - Hermes may create, edit, resume, or remove Hermes internal cron jobs when a valid work item explicitly requests scheduled Hermes behavior.
     - The Kubernetes queue CronJob schedule is `7 * * * *`; the fast review-poll CronJob schedule is `*/5 * * * *`.
     - This run should only bootstrap/reconcile the GitHub work queue and, if possible, process the oldest ready ticket.
 
@@ -61,7 +61,8 @@ data:
 
     Kubernetes scheduling:
     - This process is already started by Kubernetes CronJob `hermes-autonomy-review-poll`.
-    - Do not create, edit, resume, or rely on Hermes internal cron jobs, `/cron`, `hermes cron`, or cronjob tools.
+    - Do not create a Hermes internal cron job to schedule this review-poll trigger; Kubernetes already owns that scheduler.
+    - Hermes may create, edit, resume, or remove Hermes internal cron jobs when a valid work item explicitly requests scheduled Hermes behavior.
     - Do not scan for new tickets and do not start unrelated work.
 
     Handle only the review or comment event supplied by the wrapper. Do not scan for new tickets and do not start unrelated work.
