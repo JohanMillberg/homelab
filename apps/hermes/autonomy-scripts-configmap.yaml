@@ -1,0 +1,476 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hermes-autonomy-scripts
+  namespace: hermes
+data:
+  autonomy_trigger.py: |
+    import json
+    import os
+    import socket
+    import subprocess
+    import sys
+    import threading
+    import time
+    import uuid
+    from datetime import datetime, timedelta, timezone
+    from pathlib import Path
+
+    import jwt
+    import requests
+
+
+    GITHUB_API = "https://api.github.com"
+    SA_DIR = Path("/var/run/secrets/kubernetes.io/serviceaccount")
+
+
+    def env(name, default=None):
+        value = os.environ.get(name, default)
+        if value is None:
+            raise RuntimeError(f"missing required environment variable: {name}")
+        return value
+
+
+    def now_utc():
+        return datetime.now(timezone.utc)
+
+
+    def kube_time(value):
+        return value.isoformat().replace("+00:00", "Z")
+
+
+    def parse_kube_time(value):
+        if not value:
+            return None
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+    def request_json(method, url, headers=None, **kwargs):
+        response = requests.request(method, url, headers=headers, timeout=30, **kwargs)
+        if response.status_code >= 400:
+            body = response.text[:800]
+            raise RuntimeError(f"{method} {url} failed with {response.status_code}: {body}")
+        if response.status_code == 204 or not response.text:
+            return None
+        return response.json()
+
+
+    def github_app_jwt():
+        app_id = env("HERMES_GITHUB_APP_ID")
+        private_key = env("HERMES_GITHUB_PRIVATE_KEY")
+        issued_at = int(time.time()) - 60
+        payload = {
+            "iat": issued_at,
+            "exp": issued_at + 540,
+            "iss": app_id,
+        }
+        return jwt.encode(payload, private_key, algorithm="RS256")
+
+
+    def github_installation_token():
+        installation_id = env("HERMES_GITHUB_INSTALLATION_ID")
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {github_app_jwt()}",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+        payload = request_json(
+            "POST",
+            f"{GITHUB_API}/app/installations/{installation_id}/access_tokens",
+            headers=headers,
+        )
+        return payload["token"]
+
+
+    def github_headers(token):
+        return {
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {token}",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
+
+
+    def github_get(token, path):
+        return request_json("GET", f"{GITHUB_API}{path}", headers=github_headers(token))
+
+
+    def github_paginate(token, path):
+        page = 1
+        items = []
+        separator = "&" if "?" in path else "?"
+        while True:
+            payload = github_get(token, f"{path}{separator}per_page=100&page={page}")
+            if isinstance(payload, dict) and "repositories" in payload:
+                batch = payload["repositories"]
+            else:
+                batch = payload
+            if not batch:
+                return items
+            items.extend(batch)
+            if len(batch) < 100:
+                return items
+            page += 1
+
+
+    class LeaseLock:
+        def __init__(self, name, namespace, holder, duration_seconds=120):
+            self.name = name
+            self.namespace = namespace
+            self.holder = holder
+            self.duration_seconds = duration_seconds
+            self.stop = threading.Event()
+            self.thread = None
+            self.token = (SA_DIR / "token").read_text().strip()
+            self.ca_cert = str(SA_DIR / "ca.crt")
+            self.api = f"https://{env('KUBERNETES_SERVICE_HOST')}:{env('KUBERNETES_SERVICE_PORT')}"
+
+        def headers(self):
+            return {
+                "Authorization": f"Bearer {self.token}",
+                "Content-Type": "application/json",
+            }
+
+        def url(self):
+            return (
+                f"{self.api}/apis/coordination.k8s.io/v1/namespaces/"
+                f"{self.namespace}/leases/{self.name}"
+            )
+
+        def request(self, method, url, **kwargs):
+            return requests.request(
+                method,
+                url,
+                headers=self.headers(),
+                verify=self.ca_cert,
+                timeout=15,
+                **kwargs,
+            )
+
+        def current(self):
+            response = self.request("GET", self.url())
+            if response.status_code == 404:
+                return None
+            if response.status_code >= 400:
+                raise RuntimeError(f"lease GET failed with {response.status_code}: {response.text[:500]}")
+            return response.json()
+
+        def lease_body(self, resource_version=None, acquire_time=None):
+            timestamp = now_utc()
+            metadata = {"name": self.name, "namespace": self.namespace}
+            if resource_version:
+                metadata["resourceVersion"] = resource_version
+            return {
+                "apiVersion": "coordination.k8s.io/v1",
+                "kind": "Lease",
+                "metadata": metadata,
+                "spec": {
+                    "holderIdentity": self.holder,
+                    "leaseDurationSeconds": self.duration_seconds,
+                    "acquireTime": acquire_time or kube_time(timestamp),
+                    "renewTime": kube_time(timestamp),
+                },
+            }
+
+        def expired(self, lease):
+            spec = lease.get("spec", {})
+            renew_time = parse_kube_time(spec.get("renewTime"))
+            duration = int(spec.get("leaseDurationSeconds") or self.duration_seconds)
+            if renew_time is None:
+                return True
+            return now_utc() > renew_time + timedelta(seconds=duration)
+
+        def acquire(self):
+            lease = self.current()
+            if lease is None:
+                response = self.request(
+                    "POST",
+                    f"{self.api}/apis/coordination.k8s.io/v1/namespaces/{self.namespace}/leases",
+                    json=self.lease_body(),
+                )
+                if response.status_code in (200, 201):
+                    self.start_renewer()
+                    return True
+                if response.status_code == 409:
+                    return False
+                raise RuntimeError(f"lease CREATE failed with {response.status_code}: {response.text[:500]}")
+
+            spec = lease.get("spec", {})
+            holder = spec.get("holderIdentity")
+            if holder != self.holder and not self.expired(lease):
+                print(f"implementation lease held by {holder}; no work started")
+                return False
+
+            resource_version = lease["metadata"]["resourceVersion"]
+            response = self.request(
+                "PUT",
+                self.url(),
+                json=self.lease_body(resource_version, spec.get("acquireTime")),
+            )
+            if response.status_code in (200, 201):
+                self.start_renewer()
+                return True
+            if response.status_code == 409:
+                return False
+            raise RuntimeError(f"lease UPDATE failed with {response.status_code}: {response.text[:500]}")
+
+        def renew_once(self):
+            lease = self.current()
+            if lease is None:
+                raise RuntimeError("lease disappeared during renewal")
+            if lease.get("spec", {}).get("holderIdentity") != self.holder:
+                raise RuntimeError("lease holder changed during renewal")
+            resource_version = lease["metadata"]["resourceVersion"]
+            response = self.request(
+                "PUT",
+                self.url(),
+                json=self.lease_body(resource_version, lease.get("spec", {}).get("acquireTime")),
+            )
+            if response.status_code not in (200, 201):
+                raise RuntimeError(f"lease RENEW failed with {response.status_code}: {response.text[:500]}")
+
+        def renew_loop(self):
+            while not self.stop.wait(30):
+                try:
+                    self.renew_once()
+                except Exception as exc:
+                    print(f"lease renewal failed: {exc}", file=sys.stderr)
+                    os._exit(2)
+
+        def start_renewer(self):
+            self.thread = threading.Thread(target=self.renew_loop, daemon=True)
+            self.thread.start()
+
+        def release(self):
+            self.stop.set()
+            try:
+                lease = self.current()
+                if lease and lease.get("spec", {}).get("holderIdentity") == self.holder:
+                    response = self.request("DELETE", self.url())
+                    if response.status_code not in (200, 202, 404):
+                        print(f"lease DELETE failed with {response.status_code}", file=sys.stderr)
+            finally:
+                if self.thread:
+                    self.thread.join(timeout=2)
+
+
+    def state_root():
+        root = Path(env("HERMES_AUTONOMY_ROOT", "/opt/data/hermes-autonomy")) / "state"
+        root.mkdir(parents=True, exist_ok=True)
+        (root / "review-events").mkdir(parents=True, exist_ok=True)
+        return root
+
+
+    def prompt_text(path):
+        return Path(path).read_text()
+
+
+    def workspace_usage():
+        root = Path(env("HERMES_WORKSPACE_ROOT", "/opt/data/workspaces/github"))
+        if not root.exists():
+            return 0
+        total = 0
+        for child in root.rglob("*"):
+            try:
+                if child.is_file():
+                    total += child.stat().st_size
+            except OSError:
+                pass
+        return total
+
+
+    def enforce_disk_policy():
+        usage = workspace_usage()
+        warn = int(env("HERMES_DISK_WARN_BYTES", "7516192768"))
+        block = int(env("HERMES_DISK_BLOCK_BYTES", "9663676416"))
+        if usage >= block:
+            raise RuntimeError(f"workspace usage {usage} bytes exceeds block threshold {block}")
+        if usage >= warn:
+            print(f"workspace usage warning: {usage} bytes exceeds warning threshold {warn}")
+
+
+    def run_hermes(prompt, event_path=None):
+        token = github_installation_token()
+        run_env = os.environ.copy()
+        run_env["GITHUB_TOKEN"] = token
+        run_env["HERMES_GITHUB_TOKEN"] = token
+        run_env["HERMES_HOME"] = env("HERMES_HOME", "/opt/data")
+        run_env["HERMES_YOLO_MODE"] = "1"
+        run_env.setdefault("HERMES_ACCEPT_HOOKS", "1")
+
+        if event_path:
+            event = Path(event_path).read_text()
+            prompt = f"{prompt}\n\nReview event JSON:\n```json\n{event}\n```\n"
+
+        root = Path(env("HERMES_AUTONOMY_ROOT", "/opt/data/hermes-autonomy"))
+        root.mkdir(parents=True, exist_ok=True)
+        hermes_bin = env("HERMES_BIN", "/opt/hermes/.venv/bin/hermes")
+        command = [hermes_bin, "chat", "-Q", "-q", prompt]
+        return subprocess.run(command, cwd=str(root), env=run_env).returncode
+
+
+    def lock_holder():
+        pod_name = os.environ.get("HOSTNAME", socket.gethostname())
+        return f"{pod_name}-{uuid.uuid4()}"
+
+
+    def with_lease(fn):
+        namespace = (SA_DIR / "namespace").read_text().strip()
+        lease = LeaseLock(
+            env("HERMES_IMPLEMENTATION_LEASE_NAME", "hermes-autonomy-implementation"),
+            namespace,
+            lock_holder(),
+        )
+        if not lease.acquire():
+            return 0
+        try:
+            return fn()
+        finally:
+            lease.release()
+
+
+    def queue_mode():
+        def work():
+            enforce_disk_policy()
+            return run_hermes(prompt_text(env("HERMES_QUEUE_PROMPT_PATH")))
+
+        return with_lease(work)
+
+
+    def load_cursor(path):
+        if not path.exists():
+            return {}
+        return json.loads(path.read_text())
+
+
+    def save_cursor(path, cursor):
+        tmp = path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(cursor, indent=2, sort_keys=True))
+        tmp.replace(path)
+
+
+    def max_id(items):
+        ids = [int(item["id"]) for item in items if item.get("id") is not None]
+        return max(ids) if ids else 0
+
+
+    def user_events(items, previous_id, author, event_type):
+        events = []
+        for item in items:
+            item_id = int(item.get("id") or 0)
+            login = (item.get("user") or {}).get("login")
+            if item_id > previous_id and login == author:
+                events.append({"type": event_type, "id": item_id, "payload": item})
+        return events
+
+
+    def installation_repositories(token):
+        return github_paginate(token, "/installation/repositories")
+
+
+    def write_event_file(event):
+        path = state_root() / "review-events" / f"{int(time.time())}-{uuid.uuid4()}.json"
+        path.write_text(json.dumps(event, indent=2, sort_keys=True))
+        return path
+
+
+    def discover_review_events():
+        token = github_installation_token()
+        org = env("HERMES_GITHUB_ORG")
+        author = env("HERMES_WORK_AUTHOR")
+        cursor_path = state_root() / "review-cursors.json"
+        cursor = load_cursor(cursor_path)
+        first_scan = not cursor_path.exists()
+        found = []
+
+        for repo in installation_repositories(token):
+            owner = (repo.get("owner") or {}).get("login")
+            name = repo.get("name")
+            if owner != org or not name:
+                continue
+
+            pulls = github_paginate(token, f"/repos/{owner}/{name}/pulls?state=open")
+            for pr in pulls:
+                head = pr.get("head") or {}
+                if not str(head.get("ref", "")).startswith("hermes/issue-"):
+                    continue
+
+                number = pr["number"]
+                key = f"{owner}/{name}#{number}"
+                entry = cursor.setdefault(key, {})
+                issue_comments = github_paginate(token, f"/repos/{owner}/{name}/issues/{number}/comments")
+                review_comments = github_paginate(token, f"/repos/{owner}/{name}/pulls/{number}/comments")
+                reviews = github_paginate(token, f"/repos/{owner}/{name}/pulls/{number}/reviews")
+
+                if not first_scan:
+                    found.extend(
+                        {
+                            "repository": f"{owner}/{name}",
+                            "pull_request": number,
+                            "html_url": pr.get("html_url"),
+                            "event": event,
+                        }
+                        for event in user_events(issue_comments, int(entry.get("issue_comments", 0)), author, "issue_comment")
+                    )
+                    found.extend(
+                        {
+                            "repository": f"{owner}/{name}",
+                            "pull_request": number,
+                            "html_url": pr.get("html_url"),
+                            "event": event,
+                        }
+                        for event in user_events(review_comments, int(entry.get("review_comments", 0)), author, "review_comment")
+                    )
+                    found.extend(
+                        {
+                            "repository": f"{owner}/{name}",
+                            "pull_request": number,
+                            "html_url": pr.get("html_url"),
+                            "event": event,
+                        }
+                        for event in user_events(reviews, int(entry.get("reviews", 0)), author, "review")
+                    )
+
+                entry["issue_comments"] = max_id(issue_comments)
+                entry["review_comments"] = max_id(review_comments)
+                entry["reviews"] = max_id(reviews)
+
+        save_cursor(cursor_path, cursor)
+        return [write_event_file(event) for event in found]
+
+
+    def pending_event():
+        events = sorted((state_root() / "review-events").glob("*.json"))
+        return events[0] if events else None
+
+
+    def fast_poll_mode():
+        event_path = pending_event()
+        if event_path is None:
+            new_events = discover_review_events()
+            if not new_events:
+                print("no actionable GitHub review/comment events found")
+                return 0
+            event_path = new_events[0]
+            print(f"queued {len(new_events)} actionable GitHub review/comment event(s)")
+
+        def work():
+            enforce_disk_policy()
+            code = run_hermes(prompt_text(env("HERMES_REVIEW_PROMPT_PATH")), event_path)
+            if code == 0:
+                event_path.unlink(missing_ok=True)
+            return code
+
+        return with_lease(work)
+
+
+    def main():
+        if len(sys.argv) != 2 or sys.argv[1] not in {"queue", "fast-poll"}:
+            print("usage: autonomy_trigger.py queue|fast-poll", file=sys.stderr)
+            return 2
+        if sys.argv[1] == "queue":
+            return queue_mode()
+        return fast_poll_mode()
+
+
+    if __name__ == "__main__":
+        raise SystemExit(main())

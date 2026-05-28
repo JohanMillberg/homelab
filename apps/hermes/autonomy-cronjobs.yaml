@@ -1,0 +1,125 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hermes-autonomy-queue
+  namespace: hermes
+spec:
+  schedule: "7 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 2700
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: hermes-autonomy
+          restartPolicy: Never
+          containers:
+            - name: hermes
+              image: nousresearch/hermes-agent:latest
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - configMapRef:
+                    name: hermes-config
+                - configMapRef:
+                    name: hermes-autonomy-config
+                - secretRef:
+                    name: hermes-secret
+                - secretRef:
+                    name: hermes-github-app-secret
+              env:
+                - name: HERMES_HOME
+                  value: /opt/data
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - |
+                  set -eu
+                  mkdir -p /opt/data/hermes-autonomy/state/review-events /opt/data/workspaces/github
+                  chown -R 10000:10000 /opt/data/hermes-autonomy /opt/data/workspaces
+                  exec su hermes -c "/opt/hermes/.venv/bin/python /opt/hermes-autonomy/scripts/autonomy_trigger.py queue"
+              volumeMounts:
+                - name: data
+                  mountPath: /opt/data
+                - name: autonomy-prompts
+                  mountPath: /opt/hermes-autonomy/prompts
+                  readOnly: true
+                - name: autonomy-scripts
+                  mountPath: /opt/hermes-autonomy/scripts
+                  readOnly: true
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: hermes-data
+            - name: autonomy-prompts
+              configMap:
+                name: hermes-autonomy-prompts
+            - name: autonomy-scripts
+              configMap:
+                name: hermes-autonomy-scripts
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hermes-autonomy-review-poll
+  namespace: hermes
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 2700
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: hermes-autonomy
+          restartPolicy: Never
+          containers:
+            - name: hermes
+              image: nousresearch/hermes-agent:latest
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - configMapRef:
+                    name: hermes-config
+                - configMapRef:
+                    name: hermes-autonomy-config
+                - secretRef:
+                    name: hermes-secret
+                - secretRef:
+                    name: hermes-github-app-secret
+              env:
+                - name: HERMES_HOME
+                  value: /opt/data
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - |
+                  set -eu
+                  mkdir -p /opt/data/hermes-autonomy/state/review-events /opt/data/workspaces/github
+                  chown -R 10000:10000 /opt/data/hermes-autonomy /opt/data/workspaces
+                  exec su hermes -c "/opt/hermes/.venv/bin/python /opt/hermes-autonomy/scripts/autonomy_trigger.py fast-poll"
+              volumeMounts:
+                - name: data
+                  mountPath: /opt/data
+                - name: autonomy-prompts
+                  mountPath: /opt/hermes-autonomy/prompts
+                  readOnly: true
+                - name: autonomy-scripts
+                  mountPath: /opt/hermes-autonomy/scripts
+                  readOnly: true
+          volumes:
+            - name: data
+              persistentVolumeClaim:
+                claimName: hermes-data
+            - name: autonomy-prompts
+              configMap:
+                name: hermes-autonomy-prompts
+            - name: autonomy-scripts
+              configMap:
+                name: hermes-autonomy-scripts

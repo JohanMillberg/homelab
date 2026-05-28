@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hermes-autonomy-config
+  namespace: hermes
+data:
+  HERMES_GITHUB_APP_ID: "3893538"
+  HERMES_GITHUB_INSTALLATION_ID: "136273010"
+  HERMES_GITHUB_ORG: "kvarnberg-labs"
+  HERMES_GITHUB_WORK_QUEUE_REPO: "hermes-work-queue"
+  HERMES_WORK_AUTHOR: "JohanMillberg"
+  HERMES_WORK_READY_LABEL: "hermes-ready"
+  HERMES_WORKSPACE_ROOT: "/opt/data/workspaces/github"
+  HERMES_AUTONOMY_ROOT: "/opt/data/hermes-autonomy"
+  HERMES_IMPLEMENTATION_LEASE_NAME: "hermes-autonomy-implementation"
+  HERMES_QUEUE_PROMPT_PATH: "/opt/hermes-autonomy/prompts/queue-scanner.md"
+  HERMES_REVIEW_PROMPT_PATH: "/opt/hermes-autonomy/prompts/review-response.md"
+  HERMES_DISK_WARN_BYTES: "7516192768"
+  HERMES_DISK_BLOCK_BYTES: "9663676416"

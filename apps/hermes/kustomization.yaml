@@ -3,7 +3,14 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - configmap.yaml
+  - autonomy-configmap.yaml
+  - autonomy-prompts-configmap.yaml
+  - autonomy-scripts-configmap.yaml
+  - serviceaccount.yaml
+  - rbac.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml
   - hermes-sealed-secret.yaml
+  - hermes-github-app-sealed-secret.yaml
+  - autonomy-cronjobs.yaml
