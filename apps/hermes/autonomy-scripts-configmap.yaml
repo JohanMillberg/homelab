@@ -342,8 +342,37 @@ data:
         return f"{selection['repository']}#issue-{selection['issue_number']}"
 
 
+    def block_queue_issue(token, selection, reason):
+        if not selection.get("repository") or not selection.get("issue_number"):
+            return
+        repository = selection["repository"]
+        issue_number = int(selection["issue_number"])
+        comment_issue(
+            token,
+            repository,
+            issue_number,
+            f"Hermes is blocking this ticket after three consecutive scheduled-run {reason}.",
+        )
+        add_issue_label(token, repository, issue_number, "hermes-blocked")
+        remove_issue_label(token, repository, issue_number, "hermes-working")
+        remove_issue_label(token, repository, issue_number, "hermes-ready")
+
+
+    def record_queue_failure(token, selection, reason):
+        if not selection:
+            return 0
+        key = selection.get("key") or selection_key(selection)
+        _active_path, timeouts_path = queue_attempt_paths()
+        timeouts = load_json_file(timeouts_path, {})
+        timeouts[key] = int(timeouts.get(key, 0)) + 1
+        write_json_file(timeouts_path, timeouts)
+        if timeouts[key] >= 3:
+            block_queue_issue(token, selection, reason)
+        return timeouts[key]
+
+
     def record_stale_queue_attempt(token):
-        active_path, timeouts_path = queue_attempt_paths()
+        active_path, _timeouts_path = queue_attempt_paths()
         if not active_path.exists():
             return
         active = load_json_file(active_path, {})
@@ -352,23 +381,8 @@ data:
         if started_at is None or now_utc() <= started_at + timedelta(seconds=deadline):
             return
 
-        key = active.get("key")
-        timeouts = load_json_file(timeouts_path, {})
-        timeouts[key] = int(timeouts.get(key, 0)) + 1
-        write_json_file(timeouts_path, timeouts)
+        record_queue_failure(token, active, "timeouts")
         active_path.unlink(missing_ok=True)
-
-        if timeouts[key] >= 3 and active.get("repository") and active.get("issue_number"):
-            repository = active["repository"]
-            issue_number = int(active["issue_number"])
-            comment_issue(
-                token,
-                repository,
-                issue_number,
-                "Hermes is blocking this ticket after three consecutive scheduled-run timeouts.",
-            )
-            add_issue_label(token, repository, issue_number, "hermes-blocked")
-            remove_issue_label(token, repository, issue_number, "hermes-working")
 
 
     def mark_queue_run(selection):
@@ -386,6 +400,8 @@ data:
             timeouts = load_json_file(timeouts_path, {})
             timeouts.pop(selection_key(selection), None)
             write_json_file(timeouts_path, timeouts)
+            return
+        record_queue_failure(github_installation_token(), selection, "non-zero Hermes exits")
 
 
     def active_implementation_pr(token):
