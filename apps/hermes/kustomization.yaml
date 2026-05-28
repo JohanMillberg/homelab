@@ -6,6 +6,7 @@ resources:
   - autonomy-configmap.yaml
   - autonomy-prompts-configmap.yaml
   - autonomy-scripts-configmap.yaml
+  - github-tools-configmap.yaml
   - serviceaccount.yaml
   - rbac.yaml
   - networkpolicy.yaml

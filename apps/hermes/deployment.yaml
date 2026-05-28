@@ -24,6 +24,18 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /opt/data
+        - name: install-github-cli
+          image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+          imagePullPolicy: IfNotPresent
+          command: ["/opt/hermes-github-tools/install-gh"]
+          volumeMounts:
+            - name: data
+              mountPath: /opt/data
+            - name: github-cli-bin
+              mountPath: /opt/github-cli
+            - name: github-tools
+              mountPath: /opt/hermes-github-tools
+              readOnly: true
         - name: configure-hermes
           image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
           imagePullPolicy: IfNotPresent
@@ -61,18 +73,33 @@ spec:
           envFrom:
             - configMapRef:
                 name: hermes-config
+            - configMapRef:
+                name: hermes-autonomy-config
             - secretRef:
                 name: hermes-api-secret
             - secretRef:
                 name: hermes-discord-secret
             - secretRef:
                 name: hermes-model-secret
+            - secretRef:
+                name: hermes-github-app-secret
           env:
             - name: HERMES_HOME
               value: /opt/data
           volumeMounts:
             - name: data
               mountPath: /opt/data
+            - name: github-cli-bin
+              mountPath: /opt/github-cli
+              readOnly: true
+            - name: github-tools
+              mountPath: /usr/local/bin/gh
+              subPath: gh
+              readOnly: true
+            - name: github-tools
+              mountPath: /usr/local/bin/github-app-token
+              subPath: github-app-token
+              readOnly: true
           startupProbe:
             httpGet:
               path: /health
@@ -102,3 +129,9 @@ spec:
         - name: data
           persistentVolumeClaim:
             claimName: hermes-data
+        - name: github-cli-bin
+          emptyDir: {}
+        - name: github-tools
+          configMap:
+            name: hermes-github-tools
+            defaultMode: 0555

@@ -16,6 +16,19 @@ spec:
         spec:
           serviceAccountName: hermes-autonomy
           restartPolicy: Never
+          initContainers:
+            - name: install-github-cli
+              image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+              imagePullPolicy: IfNotPresent
+              command: ["/opt/hermes-github-tools/install-gh"]
+              volumeMounts:
+                - name: data
+                  mountPath: /opt/data
+                - name: github-cli-bin
+                  mountPath: /opt/github-cli
+                - name: github-tools
+                  mountPath: /opt/hermes-github-tools
+                  readOnly: true
           containers:
             - name: hermes
               image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
@@ -54,6 +67,17 @@ spec:
                 - name: autonomy-scripts
                   mountPath: /opt/hermes-autonomy/scripts
                   readOnly: true
+                - name: github-cli-bin
+                  mountPath: /opt/github-cli
+                  readOnly: true
+                - name: github-tools
+                  mountPath: /usr/local/bin/gh
+                  subPath: gh
+                  readOnly: true
+                - name: github-tools
+                  mountPath: /usr/local/bin/github-app-token
+                  subPath: github-app-token
+                  readOnly: true
               resources:
                 requests:
                   cpu: 500m
@@ -71,6 +95,12 @@ spec:
             - name: autonomy-scripts
               configMap:
                 name: hermes-autonomy-scripts
+            - name: github-cli-bin
+              emptyDir: {}
+            - name: github-tools
+              configMap:
+                name: hermes-github-tools
+                defaultMode: 0555
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -90,6 +120,19 @@ spec:
         spec:
           serviceAccountName: hermes-autonomy
           restartPolicy: Never
+          initContainers:
+            - name: install-github-cli
+              image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+              imagePullPolicy: IfNotPresent
+              command: ["/opt/hermes-github-tools/install-gh"]
+              volumeMounts:
+                - name: data
+                  mountPath: /opt/data
+                - name: github-cli-bin
+                  mountPath: /opt/github-cli
+                - name: github-tools
+                  mountPath: /opt/hermes-github-tools
+                  readOnly: true
           containers:
             - name: hermes
               image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
@@ -128,6 +171,17 @@ spec:
                 - name: autonomy-scripts
                   mountPath: /opt/hermes-autonomy/scripts
                   readOnly: true
+                - name: github-cli-bin
+                  mountPath: /opt/github-cli
+                  readOnly: true
+                - name: github-tools
+                  mountPath: /usr/local/bin/gh
+                  subPath: gh
+                  readOnly: true
+                - name: github-tools
+                  mountPath: /usr/local/bin/github-app-token
+                  subPath: github-app-token
+                  readOnly: true
               resources:
                 requests:
                   cpu: 500m
@@ -145,3 +199,9 @@ spec:
             - name: autonomy-scripts
               configMap:
                 name: hermes-autonomy-scripts
+            - name: github-cli-bin
+              emptyDir: {}
+            - name: github-tools
+              configMap:
+                name: hermes-github-tools
+                defaultMode: 0555
