@@ -5,3 +5,4 @@
 # Secret templates — must be sealed with kubeseal before committing.
 # The sealed output (plan-assistant-sealed-secret.yaml, registry-sealed-secret.yaml) IS safe to commit.
 **/secret-template.yaml
+hermes-ollama-api-key.txt
