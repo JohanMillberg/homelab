@@ -14,6 +14,8 @@ spec:
     metadata:
       labels:
         app: hermes
+      annotations:
+        hermes.kvarnberg.io/config-generation: "ollama-cloud-2026-05-28"
     spec:
       initContainers:
         - name: fix-data-permissions
