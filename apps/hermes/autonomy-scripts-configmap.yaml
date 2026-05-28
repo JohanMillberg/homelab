@@ -288,6 +288,49 @@ data:
             print(f"workspace usage warning: {usage} bytes exceeds warning threshold {warn}")
 
 
+    def cleanup_internal_cron_jobs():
+        cron_path = Path(env("HERMES_HOME", "/opt/data")) / "cron" / "jobs.json"
+        if not cron_path.exists():
+            return
+        try:
+            data = json.loads(cron_path.read_text())
+        except Exception as exc:
+            print(f"could not inspect Hermes internal cron jobs: {exc}", file=sys.stderr)
+            return
+
+        jobs = data.get("jobs", [])
+        kept = []
+        removed = []
+        for job in jobs:
+            name = str(job.get("name") or "")
+            prompt = str(job.get("prompt") or "")
+            is_duplicate_scheduler = (
+                name == "Hourly GitHub Work Trigger"
+                or (
+                    "kvarnberg-labs/hermes-work-queue" in prompt
+                    and "GitHub Work Trigger" in name
+                )
+                or (
+                    "autonomous hourly GitHub work trigger" in prompt
+                    and "hermes-work-queue" in prompt
+                )
+            )
+            if is_duplicate_scheduler:
+                removed.append(job.get("id") or name or "<unknown>")
+            else:
+                kept.append(job)
+
+        if not removed:
+            return
+
+        data["jobs"] = kept
+        data["updated_at"] = kube_time(now_utc())
+        tmp = cron_path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(data, indent=2, sort_keys=False))
+        tmp.replace(cron_path)
+        print(f"removed duplicate Hermes internal cron job(s): {', '.join(map(str, removed))}")
+
+
     def run_hermes(prompt, event_path=None):
         token = github_installation_token()
         run_env = os.environ.copy()
@@ -305,7 +348,11 @@ data:
         root.mkdir(parents=True, exist_ok=True)
         hermes_bin = env("HERMES_BIN", "/opt/hermes/.venv/bin/hermes")
         command = [hermes_bin, "chat", "-Q", "-q", prompt]
-        return subprocess.run(command, cwd=str(root), env=run_env).returncode
+        cleanup_internal_cron_jobs()
+        try:
+            return subprocess.run(command, cwd=str(root), env=run_env).returncode
+        finally:
+            cleanup_internal_cron_jobs()
 
 
     def lock_holder():

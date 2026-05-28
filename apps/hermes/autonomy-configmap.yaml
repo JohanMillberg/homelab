@@ -15,5 +15,7 @@ data:
   HERMES_IMPLEMENTATION_LEASE_NAME: "hermes-autonomy-implementation"
   HERMES_QUEUE_PROMPT_PATH: "/opt/hermes-autonomy/prompts/queue-scanner.md"
   HERMES_REVIEW_PROMPT_PATH: "/opt/hermes-autonomy/prompts/review-response.md"
+  HERMES_QUEUE_SCHEDULE: "7 * * * *"
+  HERMES_REVIEW_POLL_SCHEDULE: "*/5 * * * *"
   HERMES_DISK_WARN_BYTES: "7516192768"
   HERMES_DISK_BLOCK_BYTES: "9663676416"
