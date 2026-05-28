@@ -35,13 +35,20 @@ data:
     exec /opt/hermes/.venv/bin/python - <<'PY'
     import os
     import time
+    from pathlib import Path
 
     import jwt
     import requests
 
     app_id = os.environ["HERMES_GITHUB_APP_ID"]
     installation_id = os.environ["HERMES_GITHUB_INSTALLATION_ID"]
-    private_key = os.environ["HERMES_GITHUB_PRIVATE_KEY"]
+    private_key = os.environ.get("HERMES_GITHUB_PRIVATE_KEY", "")
+    if not private_key or "PRIVATE KEY" not in private_key:
+        key_path = os.environ.get(
+            "HERMES_GITHUB_PRIVATE_KEY_FILE",
+            "/opt/hermes-secrets/github-app/HERMES_GITHUB_PRIVATE_KEY",
+        )
+        private_key = Path(key_path).read_text()
     issued_at = int(time.time()) - 60
     app_jwt = jwt.encode(
         {"iat": issued_at, "exp": issued_at + 540, "iss": app_id},

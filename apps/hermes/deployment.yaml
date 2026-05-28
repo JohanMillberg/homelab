@@ -59,6 +59,8 @@ spec:
           env:
             - name: HERMES_HOME
               value: /opt/data
+            - name: HERMES_GITHUB_PRIVATE_KEY_FILE
+              value: /opt/hermes-secrets/github-app/HERMES_GITHUB_PRIVATE_KEY
           volumeMounts:
             - name: data
               mountPath: /opt/data
@@ -100,6 +102,9 @@ spec:
               mountPath: /usr/local/bin/github-app-token
               subPath: github-app-token
               readOnly: true
+            - name: github-app-private-key
+              mountPath: /opt/hermes-secrets/github-app
+              readOnly: true
           startupProbe:
             httpGet:
               path: /health
@@ -135,3 +140,9 @@ spec:
           configMap:
             name: hermes-github-tools
             defaultMode: 0555
+        - name: github-app-private-key
+          secret:
+            secretName: hermes-github-app-secret
+            items:
+              - key: HERMES_GITHUB_PRIVATE_KEY
+                path: HERMES_GITHUB_PRIVATE_KEY
