@@ -15,7 +15,7 @@ spec:
       labels:
         app: hermes
       annotations:
-        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-flash-2026-05-28"
+        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-flash-2026-05-31"
     spec:
       initContainers:
         - name: fix-data-permissions
@@ -25,7 +25,7 @@ spec:
             - name: data
               mountPath: /opt/data
         - name: install-github-cli
-          image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+          image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
           imagePullPolicy: IfNotPresent
           command: ["/opt/hermes-github-tools/install-gh"]
           volumeMounts:
@@ -37,7 +37,7 @@ spec:
               mountPath: /opt/hermes-github-tools
               readOnly: true
         - name: configure-hermes
-          image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+          image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
@@ -66,7 +66,7 @@ spec:
               mountPath: /opt/data
       containers:
         - name: hermes
-          image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+          image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
           imagePullPolicy: IfNotPresent
           args: ["gateway", "run"]
           ports:
