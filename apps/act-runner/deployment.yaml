@@ -33,6 +33,8 @@ spec:
                 sed -i 's|  docker_host: "-"|  docker_host: "tcp://localhost:2375"\n  network: "host"\n  privileged: true|' /data/config.yaml
                 # Inject forgejo.lan host entry (k3s node uses 1.1.1.1 DNS, not pihole, so .lan doesn't resolve)
                 sed -i 's|  options:|  options: "--add-host=forgejo.lan:192.168.1.205"|' /data/config.yaml
+                # Allow all volume mounts (runner needs to mount workspace + actions into job containers)
+                sed -i 's|  valid_volumes: \[\]|  valid_volumes:\n    - "**"|' /data/config.yaml
                 # Use node:20-bookworm-slim as job container image (has Node.js for actions; add git+docker-cli in workflow)
                 sed -i 's|  labels: \[\]|  labels:\n    - "self-hosted:docker://node:20-bookworm-slim"\n    - "linux:docker://node:20-bookworm-slim"\n    - "amd64:docker://node:20-bookworm-slim"|' /data/config.yaml
               fi

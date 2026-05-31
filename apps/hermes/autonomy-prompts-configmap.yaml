@@ -56,6 +56,20 @@ data:
     - Warn and ping when workspace usage is above 7 GiB.
     - Block new implementation work when workspace usage is above 9 GiB until cleanup or PVC expansion is approved.
     - Keep completed worktrees for 7 days and abandoned closed-without-merge worktrees for 14 days.
+
+    Sandbox deployment:
+    - The `hermes-sandbox` Kubernetes namespace is available for deploying and testing apps during implementation.
+    - The `hermes-autonomy` service account (automatically mounted in this pod) has full deploy rights in `hermes-sandbox`.
+    - Use the Python `kubernetes` library to manage resources there. The API server is at `https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT`; the service account token is at `/var/run/secrets/kubernetes.io/serviceaccount/token`.
+    - Deploy test workloads to `hermes-sandbox` to verify they start and behave correctly, then clean them up.
+    - Do not leave long-lived workloads running in `hermes-sandbox` after a work item is complete unless the ticket explicitly asks for it.
+
+    Frontend testing:
+    - For frontend validation, create a Playwright Job in `hermes-sandbox` using image `mcr.microsoft.com/playwright:v1.52.0-jammy`.
+    - Pass the test script via a ConfigMap mounted into the Job pod, or inline as a command argument.
+    - Target the app under test using its ClusterIP Service name, which is resolvable within `hermes-sandbox`.
+    - Retrieve results by reading the Job pod logs via the Kubernetes API.
+    - Clean up the Job and its ConfigMap after collecting results.
   review-response.md: |
     You are Hermes running as the fast GitHub review/comment response trigger.
 

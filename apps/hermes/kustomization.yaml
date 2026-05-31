@@ -18,3 +18,5 @@ resources:
   - hermes-model-sealed-secret.yaml
   - hermes-github-app-sealed-secret.yaml
   - autonomy-cronjobs.yaml
+  - hermes-sandbox-namespace.yaml
+  - hermes-sandbox-rbac.yaml
