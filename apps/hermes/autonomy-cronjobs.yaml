@@ -5,6 +5,7 @@ metadata:
   namespace: hermes
 spec:
   schedule: "7 * * * *"
+  suspend: true
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
@@ -120,6 +121,7 @@ metadata:
   namespace: hermes
 spec:
   schedule: "*/5 * * * *"
+  suspend: true
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
