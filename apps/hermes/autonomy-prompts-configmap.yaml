@@ -60,7 +60,7 @@ data:
     Sandbox deployment:
     - The `hermes-sandbox` Kubernetes namespace is available for deploying and testing apps during implementation.
     - The `hermes-autonomy` service account (automatically mounted in this pod) has full deploy rights in `hermes-sandbox`.
-    - Use the Python `kubernetes` library to manage resources there. The API server is at `https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT`; the service account token is at `/var/run/secrets/kubernetes.io/serviceaccount/token`.
+    - The `kubernetes` Python library is NOT installed. Use the `requests` library with direct HTTP calls instead — the same pattern used in `autonomy_trigger.py`. Read the service account token from `/var/run/secrets/kubernetes.io/serviceaccount/token`, use CA cert `/var/run/secrets/kubernetes.io/serviceaccount/ca.crt`, and target the API server at `https://$KUBERNETES_SERVICE_HOST:$KUBERNETES_SERVICE_PORT`.
     - Deploy test workloads to `hermes-sandbox` to verify they start and behave correctly, then clean them up.
     - Do not leave long-lived workloads running in `hermes-sandbox` after a work item is complete unless the ticket explicitly asks for it.
 
