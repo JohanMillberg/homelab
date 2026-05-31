@@ -432,7 +432,10 @@ data:
 
     def ready_work_issue(token):
         repository = work_queue_slug()
-        author = env("HERMES_WORK_AUTHOR")
+        trusted_authors = {env("HERMES_WORK_AUTHOR")}
+        bot_author = os.environ.get("HERMES_WORK_BOT_AUTHOR")
+        if bot_author:
+            trusted_authors.add(bot_author)
         label = env("HERMES_WORK_READY_LABEL", "hermes-ready")
         issues = github_paginate(
             token,
@@ -441,7 +444,7 @@ data:
         for issue in issues:
             if issue.get("pull_request"):
                 continue
-            if (issue.get("user") or {}).get("login") != author:
+            if (issue.get("user") or {}).get("login") not in trusted_authors:
                 continue
             missing = validate_work_issue(issue)
             if missing:
