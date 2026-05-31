@@ -278,10 +278,11 @@ data:
         return sections.get(name.lower(), "").strip()
 
 
-    def validate_work_issue(issue):
+    def validate_work_issue(issue, bot_authored=False):
         sections = extract_issue_sections(issue.get("body") or "")
         missing = []
-        for name in ("intent", "goal", "acceptance criteria", "constraints", "notes"):
+        required = ("intent",) if bot_authored else ("intent", "goal", "acceptance criteria", "constraints", "notes")
+        for name in required:
             if name not in sections:
                 missing.append(f"missing section `{name.title()}`")
         target = section_value(sections, "target repository")
@@ -290,7 +291,8 @@ data:
             missing.append("missing section `Target repository` or `New repository`")
         if not target and not new_repo:
             missing.append("either `Target repository` or `New repository` must be filled")
-        for name in ("intent", "goal", "acceptance criteria"):
+        non_empty_check = ("intent",) if bot_authored else ("intent", "goal", "acceptance criteria")
+        for name in non_empty_check:
             if name in sections and not section_value(sections, name):
                 missing.append(f"`{name.title()}` must not be empty")
 
@@ -444,9 +446,11 @@ data:
         for issue in issues:
             if issue.get("pull_request"):
                 continue
-            if (issue.get("user") or {}).get("login") not in trusted_authors:
+            issue_author = (issue.get("user") or {}).get("login")
+            if issue_author not in trusted_authors:
                 continue
-            missing = validate_work_issue(issue)
+            bot_authored = bot_author is not None and issue_author == bot_author
+            missing = validate_work_issue(issue, bot_authored=bot_authored)
             if missing:
                 clarify_invalid_issue(token, repository, issue, missing)
                 continue

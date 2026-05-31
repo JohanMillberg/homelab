@@ -9,7 +9,7 @@ data:
   HERMES_GITHUB_ORG: "kvarnberg-labs"
   HERMES_GITHUB_WORK_QUEUE_REPO: "hermes-work-queue"
   HERMES_WORK_AUTHOR: "JohanMillberg"
-  HERMES_WORK_BOT_AUTHOR: "kvarnberg-callisto"
+  HERMES_WORK_BOT_AUTHOR: "kvarnberg-callisto[bot]"
   HERMES_WORK_READY_LABEL: "hermes-ready"
   HERMES_WORKSPACE_ROOT: "/opt/data/workspaces/github"
   HERMES_AUTONOMY_ROOT: "/opt/data/hermes-autonomy"
