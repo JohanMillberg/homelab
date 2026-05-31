@@ -289,7 +289,9 @@ data:
         new_repo = section_value(sections, "new repository")
         if "target repository" not in sections and "new repository" not in sections:
             missing.append("missing section `Target repository` or `New repository`")
-        if not target and not new_repo:
+        target_clean = target.strip("`").strip()
+        new_repo_clean = new_repo.strip("`").strip()
+        if not target_clean and not new_repo_clean:
             missing.append("either `Target repository` or `New repository` must be filled")
         non_empty_check = ("intent",) if bot_authored else ("intent", "goal", "acceptance criteria")
         for name in non_empty_check:
@@ -297,9 +299,9 @@ data:
                 missing.append(f"`{name.title()}` must not be empty")
 
         org = env("HERMES_GITHUB_ORG")
-        if target and "/" in target and not target.startswith(f"{org}/"):
+        if target_clean and "/" in target_clean and not target_clean.startswith(f"{org}/"):
             missing.append(f"`Target repository` must be under `{org}` for v1")
-        if new_repo and "/" in new_repo and not new_repo.startswith(f"{org}/"):
+        if new_repo_clean and "/" in new_repo_clean and not new_repo_clean.startswith(f"{org}/"):
             missing.append(f"`New repository` must be under `{org}` for v1")
 
         return missing
