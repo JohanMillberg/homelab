@@ -49,3 +49,12 @@ spec:
       ports:
         - protocol: TCP
           port: 443
+    # In-cluster access to the plan-assistant backend so Hermes can run
+    # autonomous end-to-end tests against the deployed app (LLM recommendations).
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: plan-assistant
+      ports:
+        - protocol: TCP
+          port: 8000

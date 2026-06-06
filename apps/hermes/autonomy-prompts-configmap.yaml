@@ -64,6 +64,17 @@ data:
     - Deploy test workloads to `hermes-sandbox` to verify they start and behave correctly, then clean them up.
     - Do not leave long-lived workloads running in `hermes-sandbox` after a work item is complete unless the ticket explicitly asks for it.
 
+    Homelab GitOps deployment:
+    - `kvarnberg-labs/homelab` is the Flux GitOps source for the home cluster. Changes merged to `main` are applied automatically by Flux (poll interval 1 h; immediate via `flux reconcile`). Opening a PR to this repo is how you deploy infrastructure or apps.
+    - Branch name for homelab PRs: `hermes/issue-<number>-<short-slug>` (same convention).
+    - App structure: `apps/<name>/` containing at minimum `namespace.yaml`, HelmRelease or raw manifests, a values ConfigMap (`<name>-values.yaml`, data key exactly `values.yaml:`), and `kustomization.yaml`. Register the new directory in `apps/kustomization.yaml` (top-level list).
+    - New HelmRepository (chart source): add `<source>-helmrepo.yaml` to `infrastructure/controllers/` and register it in `infrastructure/controllers/kustomization.yaml`.
+    - Key conventions: HelmRelease `apiVersion` is always `helm.toolkit.fluxcd.io/v2`; use semver ranges like `"16.x"` not exact pins; `HelmRepository` namespace is always `flux-system`; sensitive values go in a SealedSecret, never a ConfigMap.
+    - Home network access: apps are exposed via Traefik Ingress with `host: <name>.lan`. To make a new app resolvable on the home network also add a pihole DNS entry in `apps/pihole/pihole-values.yaml` under `customDnsEntries`: `address=/<name>.lan/192.168.1.205`. The Ingress annotation is `traefik.ingress.kubernetes.io/router.entrypoints: web`.
+    - Secrets: scaffold a `<name>-secret-template.yaml` plaintext template and note in the PR that a SealedSecret must be created via `kubeseal` on the server before the PR is safe to merge. Never commit plaintext secret values. Do not create or modify SealedSecrets directly unless the ticket explicitly asks and the plaintext values are provided.
+    - Raw (non-Helm) apps: push images to `forgejo.lan/<org>/<name>:<tag>` and use raw Kubernetes manifests (see `apps/plan-assistant/` for the pattern including Deployment, Service, Ingress, and a registry pull-secret).
+    - Always test in `hermes-sandbox` first, then open the homelab PR.
+
     Frontend testing:
     - For frontend validation, create a Playwright Job in `hermes-sandbox` using image `mcr.microsoft.com/playwright:v1.52.0-jammy`.
     - Pass the test script via a ConfigMap mounted into the Job pod, or inline as a command argument.

@@ -115,3 +115,7 @@ Hermes should own work-queue bootstrap for `kvarnberg-labs/hermes-work-queue`, i
 Work-queue bootstrap should be idempotent and run at the start of each hourly scan before queue reconciliation. Missing labels or templates should be created, and drifted definitions should be updated before Hermes inspects work-item state.
 
 Bootstrap should also ensure `kvarnberg-labs/hermes-work-queue` exists. If the repository is missing and the Hermes GitHub App has repository-creation permission, Hermes should create it; if creation fails because permission is missing, Hermes should mark the run blocked and ping the user for the permission change.
+
+## Addendum (2026-06-06): GitHub App `Workflows: write`
+
+The Hermes GitHub App was granted the `Workflows: write` repository permission (in addition to the existing `Contents: write` and `Pull requests: write`). GitHub rejects any push that creates or modifies `.github/workflows/*` unless the authenticating identity holds this scope, which previously forced Hermes to split commits around workflow files and blocked it from setting up CI. Because Hermes authenticates as a GitHub App (installation tokens minted on demand by `apps/hermes/github-tools-configmap.yaml`), no new secret or PAT is introduced — the short-lived installation token simply inherits the added scope once the org accepts the updated permission. Authoring CI workflows remains gated behind ordinary work items and pull-request review; this change only removes the push-level block.
