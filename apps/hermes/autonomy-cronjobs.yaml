@@ -19,7 +19,7 @@ spec:
           restartPolicy: Never
           initContainers:
             - name: install-github-cli
-              image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+              image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
               imagePullPolicy: IfNotPresent
               command: ["/opt/hermes-github-tools/install-gh"]
               volumeMounts:
@@ -32,7 +32,7 @@ spec:
                   readOnly: true
           containers:
             - name: hermes
-              image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+              image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:
@@ -135,7 +135,7 @@ spec:
           restartPolicy: Never
           initContainers:
             - name: install-github-cli
-              image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+              image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
               imagePullPolicy: IfNotPresent
               command: ["/opt/hermes-github-tools/install-gh"]
               volumeMounts:
@@ -148,7 +148,7 @@ spec:
                   readOnly: true
           containers:
             - name: hermes
-              image: docker.io/nousresearch/hermes-agent@sha256:b6e41c155d6bfce5ad83c5d0fec670086db8a43250e4511c9474134be5482d33
+              image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:

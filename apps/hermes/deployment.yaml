@@ -15,7 +15,7 @@ spec:
       labels:
         app: hermes
       annotations:
-        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-flash-2026-05-31"
+        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-pro-2026-06-22"
     spec:
       serviceAccountName: hermes-autonomy
       initContainers:
@@ -54,6 +54,21 @@ spec:
               if [ -n "${HERMES_INFERENCE_BASE_URL:-}" ]; then
                 su hermes -c "/opt/hermes/.venv/bin/hermes config set model.base_url '$HERMES_INFERENCE_BASE_URL'"
               fi
+              # Auxiliary tasks: use opencode-go + Flash model (cheap, no extra billing)
+              # Fixes recurring OpenRouter payment errors from provider: auto routing
+              for t in compression curator title_generation triage_specifier kanban_decomposer \
+                       profile_describer approval mcp skills_hub web_extract vision; do
+                su hermes -c "/opt/hermes/.venv/bin/hermes config set auxiliary.$t.provider opencode-go"
+                su hermes -c "/opt/hermes/.venv/bin/hermes config set auxiliary.$t.base_url '$HERMES_INFERENCE_BASE_URL'"
+                su hermes -c "/opt/hermes/.venv/bin/hermes config set auxiliary.$t.model deepseek-v4-flash"
+              done
+              # Memory: raise limit so agent stops looping on 'would exceed the limit'
+              su hermes -c "/opt/hermes/.venv/bin/hermes config set memory.memory_char_limit 8000"
+              # Loop safety: stop runaway same-tool retries gracefully
+              su hermes -c "/opt/hermes/.venv/bin/hermes config set tool_loop_guardrails.hard_stop_enabled true"
+              # Multi-user: disable shared personal profile to reduce cross-user context bleed
+              # True isolation requires a second dedicated instance; this is a partial mitigation
+              su hermes -c "/opt/hermes/.venv/bin/hermes config set memory.user_profile_enabled false"
           envFrom:
             - configMapRef:
                 name: hermes-config
