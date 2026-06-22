@@ -15,7 +15,7 @@ spec:
       labels:
         app: hermes
       annotations:
-        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-pro-2026-06-22"
+        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-pro-2026-06-22b"
     spec:
       serviceAccountName: hermes-autonomy
       initContainers:
@@ -66,9 +66,6 @@ spec:
               su hermes -c "/opt/hermes/.venv/bin/hermes config set memory.memory_char_limit 8000"
               # Loop safety: stop runaway same-tool retries gracefully
               su hermes -c "/opt/hermes/.venv/bin/hermes config set tool_loop_guardrails.hard_stop_enabled true"
-              # Multi-user: disable shared personal profile to reduce cross-user context bleed
-              # True isolation requires a second dedicated instance; this is a partial mitigation
-              su hermes -c "/opt/hermes/.venv/bin/hermes config set memory.user_profile_enabled false"
           envFrom:
             - configMapRef:
                 name: hermes-config
