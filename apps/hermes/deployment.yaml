@@ -28,7 +28,7 @@ spec:
             - name: data
               mountPath: /opt/data
         - name: install-github-cli
-          image: forgejo.lan/kvarnberg/hermes-agent:main-d61abb796
+          image: forgejo.lan/kvarnberg/hermes-agent:main-5defdf099
           imagePullPolicy: IfNotPresent
           command: ["/opt/hermes-github-tools/install-gh"]
           volumeMounts:
@@ -40,7 +40,7 @@ spec:
               mountPath: /opt/hermes-github-tools
               readOnly: true
         - name: configure-hermes
-          image: forgejo.lan/kvarnberg/hermes-agent:main-d61abb796
+          image: forgejo.lan/kvarnberg/hermes-agent:main-5defdf099
           imagePullPolicy: IfNotPresent
           command: ["/bin/sh", "-c"]
           args:
@@ -81,7 +81,7 @@ spec:
               mountPath: /opt/data
       containers:
         - name: hermes
-          image: forgejo.lan/kvarnberg/hermes-agent:main-d61abb796
+          image: forgejo.lan/kvarnberg/hermes-agent:main-5defdf099
           imagePullPolicy: IfNotPresent
           args: ["gateway", "run"]
           ports:

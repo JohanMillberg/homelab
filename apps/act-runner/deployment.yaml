@@ -38,6 +38,10 @@ spec:
                 # Use node:20-bookworm-slim as job container image (has Node.js for actions; add git+docker-cli in workflow)
                 sed -i 's|  labels: \[\]|  labels:\n    - "self-hosted:docker://node:20-bookworm-slim"\n    - "linux:docker://node:20-bookworm-slim"\n    - "amd64:docker://node:20-bookworm-slim"|' /data/config.yaml
               fi
+              token_hash="$(printf '%s' "$REGISTRATION_TOKEN" | sha256sum | awk '{print $1}')"
+              if [ -f /data/.runner ] && [ "$(cat /data/.registration-token-sha256 2>/dev/null || true)" != "$token_hash" ]; then
+                rm -f /data/.runner
+              fi
               if [ ! -f /data/.runner ]; then
                 forgejo-runner register \
                   --no-interactive \
@@ -46,6 +50,7 @@ spec:
                   --name homelab-runner \
                   --labels self-hosted,linux,amd64 \
                   --config /data/config.yaml
+                printf '%s' "$token_hash" > /data/.registration-token-sha256
               fi
           env:
             - name: REGISTRATION_TOKEN
