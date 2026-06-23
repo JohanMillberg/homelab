@@ -21,7 +21,7 @@ spec:
           restartPolicy: Never
           initContainers:
             - name: install-github-cli
-              image: forgejo.lan/kvarnberg/hermes-agent:main-5defdf099
+              image: forgejo.lan/kvarnberg/hermes-agent:main-f055f612c
               imagePullPolicy: IfNotPresent
               command: ["/opt/hermes-github-tools/install-gh"]
               volumeMounts:
@@ -34,7 +34,7 @@ spec:
                   readOnly: true
           containers:
             - name: hermes
-              image: forgejo.lan/kvarnberg/hermes-agent:main-5defdf099
+              image: forgejo.lan/kvarnberg/hermes-agent:main-f055f612c
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:
@@ -139,7 +139,7 @@ spec:
           restartPolicy: Never
           initContainers:
             - name: install-github-cli
-              image: forgejo.lan/kvarnberg/hermes-agent:main-5defdf099
+              image: forgejo.lan/kvarnberg/hermes-agent:main-f055f612c
               imagePullPolicy: IfNotPresent
               command: ["/opt/hermes-github-tools/install-gh"]
               volumeMounts:
@@ -152,7 +152,7 @@ spec:
                   readOnly: true
           containers:
             - name: hermes
-              image: forgejo.lan/kvarnberg/hermes-agent:main-5defdf099
+              image: forgejo.lan/kvarnberg/hermes-agent:main-f055f612c
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:
