@@ -4,150 +4,45 @@
   "graph": {
     "hyperedges": [
       {
-        "label": ".lan DNS does not resolve in-cluster; use *.svc.cluster.local (CLAUDE.md convention, debug-live-image rule, act-runner init fix, eval-1 root cause)",
-        "members": [
-          "claude_md_lan_dns_convention",
-          "debug_live_image_in_cluster_dns",
-          "act_runner_register_initcontainer",
-          "debug_live_image_eval1"
-        ],
-        "relation": "participates_in",
-        "confidence": "EXTRACTED",
-        "confidence_score": 0.9,
-        "source_file": ".claude/skills/debug-live-image/SKILL.md"
-      },
-      {
-        "label": "Forgejo private-registry deploy flow (build/push image, registry pull SealedSecret, imagePullSecrets in Deployment)",
-        "members": [
-          "deploy_raw_app_forgejo_registry",
-          "deploy_raw_app_registry_pull_secret",
-          "seal_secret_skill",
-          "cycling_training_app_deployment",
-          "act_runner_docker_daemon_configmap"
-        ],
-        "relation": "participates_in",
-        "confidence": "INFERRED",
-        "confidence_score": 0.85,
-        "source_file": ".claude/skills/deploy-raw-app/SKILL.md"
-      },
-      {
-        "label": "Hermes autonomous coding loop (CLI Work Trigger + Fast Poll Trigger coordinate via Implementation Lock over the GitHub Work Queue)",
-        "members": [
-          "context_hermes_cli_work_trigger",
-          "context_fast_poll_trigger",
-          "context_implementation_lock",
-          "context_github_work_queue",
-          "context_shared_hermes_home"
-        ],
-        "relation": "participates_in",
-        "confidence": "EXTRACTED",
-        "confidence_score": 0.9,
-        "source_file": "CONTEXT.md"
-      },
-      {
-        "label": "Grafana observability stack (HelmRelease \u2192 values \u2192 Prometheus datasource + dashboard sidecar discovering dashboard ConfigMaps)",
+        "id": "hermes_autonomy_shared_secrets",
+        "label": "Hermes Autonomy Shared Secrets and Config",
         "nodes": [
-          "grafana_grafana_helmrelease_helmrelease",
-          "grafana_grafana_values_configmap",
-          "grafana_grafana_values_prometheus_datasource",
-          "grafana_dashboards_dashboard_sidecar",
-          "grafana_dashboards_kustomization_kustomization"
+          "hermes_autonomy_cronjobs_hermesconfig",
+          "hermes_autonomy_cronjobs_hermesautonomyconfig",
+          "hermes_autonomy_cronjobs_hermesdiscordsecret",
+          "hermes_autonomy_cronjobs_hermesmodelsecret",
+          "hermes_autonomy_cronjobs_hermesgithubappsecret"
         ],
-        "relation": "stack",
+        "relation": "participate_in",
         "confidence": "EXTRACTED",
-        "confidence_score": 0.9,
-        "source_file": "apps/grafana/grafana-values.yaml"
-      },
-      {
-        "label": "Hermes autonomy queue workflow (CronJob \u2192 config \u2192 prompt \u2192 trigger script \u2192 GitHub work queue under lease)",
-        "nodes": [
-          "hermes_autonomy_cronjobs_queue",
-          "hermes_autonomy_configmap_config",
-          "hermes_autonomy_prompts_queue_scanner",
-          "hermes_autonomy_scripts_trigger",
-          "hermes_work_queue_repo",
-          "hermes_autonomy_scripts_lease_lock"
-        ],
-        "relation": "workflow",
-        "confidence": "EXTRACTED",
-        "confidence_score": 0.95,
+        "confidence_score": 1.0,
         "source_file": "apps/hermes/autonomy-cronjobs.yaml"
       },
       {
-        "label": "Hermes fast review-poll workflow (CronJob \u2192 review-response prompt \u2192 trigger script fast-poll mode)",
+        "id": "act_runner_dind_pipeline",
+        "label": "Act Runner DinD CI Pipeline",
         "nodes": [
-          "hermes_autonomy_cronjobs_review_poll",
-          "hermes_autonomy_prompts_review_response",
-          "hermes_autonomy_scripts_trigger",
-          "hermes_github_app"
+          "act_runner_deployment_actrunnerdeployment",
+          "act_runner_deployment_dindsidecar",
+          "docker_daemon_configmap_dockerdaemonconfig"
         ],
-        "relation": "workflow",
+        "relation": "implement",
         "confidence": "EXTRACTED",
-        "confidence_score": 0.9,
-        "source_file": "apps/hermes/autonomy-cronjobs.yaml"
+        "confidence_score": 1.0,
+        "source_file": "apps/act-runner/deployment.yaml"
       },
       {
-        "label": "Hermes autonomy identity grants cross-namespace access",
+        "id": "hermes_deployment_init_chain",
+        "label": "Hermes Deployment Init Container Chain",
         "nodes": [
-          "hermes_serviceaccount_autonomy",
-          "hermes_sandbox_rbac_rolebinding",
-          "hermes_rbac_lease_rolebinding"
+          "hermes_deployment_fixpermissionsinit",
+          "hermes_autonomy_cronjobs_installghclinit",
+          "hermes_deployment_configurehermesinit"
         ],
-        "relation": "rbac_grant_chain",
-        "confidence": "EXTRACTED",
-        "confidence_score": 0.9,
-        "source_file": "apps/hermes/hermes-sandbox-rbac.yaml"
-      },
-      {
-        "label": "Plan-assistant Flux image automation flow",
-        "nodes": [
-          "plan_assistant_backend_deployment",
-          "plan_assistant_image_policy_backend_repo",
-          "plan_assistant_image_policy_backend_policy"
-        ],
-        "relation": "image_automation_pipeline",
-        "confidence": "EXTRACTED",
-        "confidence_score": 0.9,
-        "source_file": "apps/plan-assistant/image-policy.yaml"
-      },
-      {
-        "label": "plan-assistant three-tier app: frontend SPA + backend API + postgres, exposed via Ingress path routing",
-        "nodes": [
-          "plan_assistant_ingress",
-          "plan_assistant_frontend_service",
-          "plan_assistant_backend_service",
-          "plan_assistant_postgres_service",
-          "plan_assistant_postgres_statefulset"
-        ],
-        "confidence": "EXTRACTED",
-        "confidence_score": 0.9,
-        "source_file": "apps/plan-assistant/ingress.yaml"
-      },
-      {
-        "label": "Flux reconciliation chain: GitRepository \u2192 flux-system Kustomization \u2192 infrastructure-controllers \u2192 infrastructure-configs \u2192 apps",
-        "nodes": [
-          "flux_system_gitrepository",
-          "flux_system_kustomization",
-          "main_infrastructure_controllers_kustomization",
-          "main_infrastructure_configs_kustomization",
-          "main_apps_kustomization"
-        ],
+        "relation": "form",
         "confidence": "EXTRACTED",
         "confidence_score": 0.95,
-        "source_file": "clusters/main/infrastructure.yaml"
-      },
-      {
-        "label": "Hermes autonomy: two CronJob triggers sharing a Lease lock and the Hermes PVC, driven by the GitHub work queue",
-        "nodes": [
-          "adr_0001_hourly_cronjob_scanner",
-          "adr_0001_fast_preflight_cronjob",
-          "adr_0001_implementation_lock_lease",
-          "adr_0001_shared_hermes_pvc_workspaces",
-          "adr_0001_hermes_work_queue_repo"
-        ],
-        "confidence": "EXTRACTED",
-        "confidence_score": 0.95,
-        "source_file": "docs/adr/0001-github-work-queue-for-hermes-autonomy.md"
+        "source_file": "apps/hermes/deployment.yaml"
       }
     ]
   },
@@ -265,7 +160,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "debug-live-image skill",
       "id": "debug_live_image_skill"
     },
@@ -278,7 +173,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "in-cluster service url vs .lan dns rule",
       "id": "debug_live_image_in_cluster_dns"
     },
@@ -291,7 +186,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "pod failure classification (imagepullbackoff/crashloop/init/oomkilled/pending)",
       "id": "debug_live_image_pod_failure_classification"
     },
@@ -304,7 +199,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "eval 1 \u2014 act-runner stuck init:0/1",
       "id": "debug_live_image_eval1"
     },
@@ -317,7 +212,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "deploy-raw-app skill",
       "id": "deploy_raw_app_skill"
     },
@@ -330,7 +225,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "forgejo registry push (forgejo.lan, --output type=docker)",
       "id": "deploy_raw_app_forgejo_registry"
     },
@@ -343,7 +238,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "forgejo-registry-secret imagepullsecret",
       "id": "deploy_raw_app_registry_pull_secret"
     },
@@ -356,7 +251,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "alembic base migration from-scratch rule",
       "id": "deploy_raw_app_alembic_migration"
     },
@@ -369,7 +264,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "database_url configmap+secret envfrom override pattern",
       "id": "deploy_raw_app_database_url_pattern"
     },
@@ -382,7 +277,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 22,
       "norm_label": "grill-me skill",
       "id": "grill_me_skill"
     },
@@ -395,7 +290,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 18,
       "norm_label": "manage-grafana-dashboards skill",
       "id": "manage_grafana_dashboards_skill"
     },
@@ -408,7 +303,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 18,
       "norm_label": "grafanactl cli (grafana 12+)",
       "id": "manage_grafana_grafanactl"
     },
@@ -421,7 +316,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 18,
       "norm_label": "grafana sidecar dashboard provisioning (grafana_dashboard label)",
       "id": "manage_grafana_sidecar_provisioning"
     },
@@ -434,7 +329,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 18,
       "norm_label": "deprecated panel type migration (singlestat/graph -> stat/timeseries)",
       "id": "manage_grafana_panel_type_migration"
     },
@@ -447,7 +342,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 18,
       "norm_label": "${datasource} template variable convention",
       "id": "manage_grafana_datasource_template_var"
     },
@@ -564,7 +459,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 22,
       "norm_label": "write-a-prd skill",
       "id": "write_a_prd_skill"
     },
@@ -577,7 +472,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 18,
+      "community": 22,
       "norm_label": "deep module design principle",
       "id": "write_a_prd_deep_module"
     },
@@ -668,7 +563,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 13,
       "norm_label": "hermes github autonomy domain model (context.md)",
       "id": "context_md_hermes_design"
     },
@@ -681,7 +576,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 13,
       "norm_label": "hermes gateway",
       "id": "context_hermes_gateway"
     },
@@ -694,7 +589,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 13,
       "norm_label": "discord bot remote chat surface",
       "id": "context_discord_bot"
     },
@@ -707,7 +602,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 13,
       "norm_label": "hermes secret (sealed credentials)",
       "id": "context_hermes_secret"
     },
@@ -746,7 +641,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 13,
       "norm_label": "hermes github app",
       "id": "context_hermes_github_app"
     },
@@ -876,87 +771,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 11,
+      "community": 13,
       "norm_label": "opencode go account (opencode_go_api_key)",
       "id": "context_opencode_go_account"
-    },
-    {
-      "label": "act-runner Deployment",
-      "file_type": "code",
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 2,
-      "norm_label": "act-runner deployment",
-      "id": "act_runner_deployment"
-    },
-    {
-      "label": "act-runner register init container",
-      "file_type": "code",
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": "initContainers.register",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 2,
-      "norm_label": "act-runner register init container",
-      "id": "act_runner_register_initcontainer"
-    },
-    {
-      "label": "act-runner DinD sidecar",
-      "file_type": "code",
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": "containers.dind",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 2,
-      "norm_label": "act-runner dind sidecar",
-      "id": "act_runner_dind_sidecar"
-    },
-    {
-      "label": "act-runner daemon container",
-      "file_type": "code",
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": "containers.runner",
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 2,
-      "norm_label": "act-runner daemon container",
-      "id": "act_runner_runner_container"
-    },
-    {
-      "label": "act-runner-secret (REGISTRATION_TOKEN)",
-      "file_type": "concept",
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 2,
-      "norm_label": "act-runner-secret (registration_token)",
-      "id": "act_runner_sealed_secret_ref"
-    },
-    {
-      "label": "docker-daemon-config ConfigMap (insecure-registries)",
-      "file_type": "code",
-      "source_file": "apps/act-runner/docker-daemon-configmap.yaml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 2,
-      "norm_label": "docker-daemon-config configmap (insecure-registries)",
-      "id": "act_runner_docker_daemon_configmap"
     },
     {
       "label": "act-runner kustomization",
@@ -967,7 +784,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 21,
       "norm_label": "act-runner kustomization",
       "id": "act_runner_kustomization"
     },
@@ -980,7 +797,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 21,
       "norm_label": "act-runner namespace",
       "id": "act_runner_namespace"
     },
@@ -993,7 +810,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 21,
       "norm_label": "act-runner-data pvc",
       "id": "act_runner_pvc"
     },
@@ -1006,7 +823,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "cycling-training-app-config configmap",
       "id": "cycling_training_app_configmap"
     },
@@ -1019,7 +836,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "cycling-training-app deployment",
       "id": "cycling_training_app_deployment"
     },
@@ -1032,7 +849,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 2,
+      "community": 0,
       "norm_label": "cycling-training-app-secrets",
       "id": "cycling_training_app_secrets_ref"
     },
@@ -1045,7 +862,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 17,
       "norm_label": "cycling-training-app ingress (cycling.kvarnberg.labs \u2192 :8000)",
       "id": "cycling_training_app_ingress_ingress"
     },
@@ -1058,7 +875,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 17,
       "norm_label": "cycling-training-app kustomization",
       "id": "cycling_training_app_kustomization_kustomization"
     },
@@ -1071,7 +888,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 17,
       "norm_label": "cycling-training-app namespace",
       "id": "cycling_training_app_namespace_namespace"
     },
@@ -1084,7 +901,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 17,
       "norm_label": "cycling-training-app-data pvc (10gi rwo)",
       "id": "cycling_training_app_pvc_pvc"
     },
@@ -1097,7 +914,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 15,
+      "community": 17,
       "norm_label": "cycling-training-app service (clusterip :8000)",
       "id": "cycling_training_app_service_service"
     },
@@ -1110,7 +927,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 11,
       "norm_label": "forgejo helmrelease (chart 16.x)",
       "id": "forgejo_forgejo_helmrelease_helmrelease"
     },
@@ -1123,7 +940,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 11,
       "norm_label": "forgejo-values configmap (gitea, longhorn, ingress forgejo.lan)",
       "id": "forgejo_forgejo_values_configmap"
     },
@@ -1136,7 +953,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 11,
       "norm_label": "forgejo kustomization",
       "id": "forgejo_kustomization_kustomization"
     },
@@ -1149,7 +966,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 11,
       "norm_label": "forgejo-sealed-secret (forgejo-secret-values)",
       "id": "forgejo_kustomization_sealed_secret_ref"
     },
@@ -1162,7 +979,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 11,
       "norm_label": "forgejo namespace",
       "id": "forgejo_namespace_namespace"
     },
@@ -1175,7 +992,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 12,
       "norm_label": "grafana dashboards kustomization (configmapgenerator)",
       "id": "grafana_dashboards_kustomization_kustomization"
     },
@@ -1188,7 +1005,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 12,
       "norm_label": "grafana dashboard sidecar (label grafana_dashboard=1)",
       "id": "grafana_dashboards_dashboard_sidecar"
     },
@@ -1201,7 +1018,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 12,
       "norm_label": "grafana helmrelease (chart 10.x)",
       "id": "grafana_grafana_helmrelease_helmrelease"
     },
@@ -1214,7 +1031,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 12,
       "norm_label": "grafana-values configmap (longhorn, prometheus datasource, dashboard sidecar, ingress grafana.lan)",
       "id": "grafana_grafana_values_configmap"
     },
@@ -1227,7 +1044,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 12,
       "norm_label": "grafana prometheus datasource (prometheus-server.prometheus.svc)",
       "id": "grafana_grafana_values_prometheus_datasource"
     },
@@ -1240,7 +1057,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 12,
       "norm_label": "grafana kustomization",
       "id": "grafana_kustomization_kustomization"
     },
@@ -1253,7 +1070,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 10,
+      "community": 12,
       "norm_label": "grafana namespace",
       "id": "grafana_namespace_namespace"
     },
@@ -1266,7 +1083,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 10,
       "norm_label": "hermes-autonomy-config configmap (github app + schedules + disk thresholds)",
       "id": "hermes_autonomy_configmap_config"
     },
@@ -1279,35 +1096,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 10,
       "norm_label": "hermes github app (kvarnberg-callisto[bot], org kvarnberg-labs)",
       "id": "hermes_github_app"
-    },
-    {
-      "label": "hermes-autonomy-queue CronJob (7 * * * *, suspended)",
-      "file_type": "code",
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 4,
-      "norm_label": "hermes-autonomy-queue cronjob (7 * * * *, suspended)",
-      "id": "hermes_autonomy_cronjobs_queue"
-    },
-    {
-      "label": "hermes-autonomy-review-poll CronJob (*/5 * * * *, suspended)",
-      "file_type": "code",
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 4,
-      "norm_label": "hermes-autonomy-review-poll cronjob (*/5 * * * *, suspended)",
-      "id": "hermes_autonomy_cronjobs_review_poll"
     },
     {
       "label": "hermes-autonomy-prompts ConfigMap (queue-scanner.md, review-response.md)",
@@ -1318,7 +1109,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 19,
       "norm_label": "hermes-autonomy-prompts configmap (queue-scanner.md, review-response.md)",
       "id": "hermes_autonomy_prompts_configmap"
     },
@@ -1331,7 +1122,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 19,
       "norm_label": "hermes queue-scanner prompt (hourly github work trigger)",
       "id": "hermes_autonomy_prompts_queue_scanner"
     },
@@ -1344,7 +1135,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 19,
       "norm_label": "hermes review-response prompt (fast review/comment trigger)",
       "id": "hermes_autonomy_prompts_review_response"
     },
@@ -1357,7 +1148,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 10,
       "norm_label": "kvarnberg-labs/hermes-work-queue (github work queue, source of truth)",
       "id": "hermes_work_queue_repo"
     },
@@ -1370,7 +1161,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 10,
       "norm_label": "hermes-autonomy-scripts configmap (autonomy_trigger.py)",
       "id": "hermes_autonomy_scripts_configmap"
     },
@@ -1383,7 +1174,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 10,
       "norm_label": "autonomy_trigger.py (queue/fast-poll modes, github app auth, lease lock)",
       "id": "hermes_autonomy_scripts_trigger"
     },
@@ -1396,7 +1187,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 10,
       "norm_label": "leaselock (coordination.k8s.io lease via sa token)",
       "id": "hermes_autonomy_scripts_lease_lock"
     },
@@ -1409,7 +1200,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 10,
       "norm_label": "hermes disk policy (7 gib warn / 9 gib block workspace usage)",
       "id": "hermes_autonomy_scripts_disk_policy"
     },
@@ -1422,35 +1213,9 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 23,
       "norm_label": "hermes-config configmap (opencode-go, deepseek-v4-pro, api server :8642)",
       "id": "hermes_configmap_config"
-    },
-    {
-      "label": "hermes Deployment (gateway run, nousresearch/hermes-agent)",
-      "file_type": "code",
-      "source_file": "apps/hermes/deployment.yaml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 4,
-      "norm_label": "hermes deployment (gateway run, nousresearch/hermes-agent)",
-      "id": "hermes_deployment_deployment"
-    },
-    {
-      "label": "Hermes auxiliary task config (opencode-go + deepseek-v4-flash)",
-      "file_type": "rationale",
-      "source_file": "apps/hermes/deployment.yaml",
-      "source_location": null,
-      "source_url": null,
-      "captured_at": null,
-      "author": null,
-      "contributor": null,
-      "community": 4,
-      "norm_label": "hermes auxiliary task config (opencode-go + deepseek-v4-flash)",
-      "id": "hermes_deployment_aux_config"
     },
     {
       "label": "hermes-github-tools ConfigMap (install-gh, github-app-token, gh wrapper)",
@@ -1461,7 +1226,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 10,
       "norm_label": "hermes-github-tools configmap (install-gh, github-app-token, gh wrapper)",
       "id": "hermes_github_tools_configmap"
     },
@@ -1474,7 +1239,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 4,
+      "community": 19,
       "norm_label": "hermes-sandbox namespace",
       "id": "hermes_sandbox_namespace_namespace"
     },
@@ -1487,7 +1252,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "role hermes-sandbox-admin",
       "id": "hermes_sandbox_rbac_role"
     },
@@ -1500,7 +1265,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "rolebinding hermes-sandbox-admin",
       "id": "hermes_sandbox_rbac_rolebinding"
     },
@@ -1513,7 +1278,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "hermes kustomization",
       "id": "hermes_kustomization"
     },
@@ -1526,7 +1291,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "namespace hermes",
       "id": "hermes_namespace"
     },
@@ -1539,7 +1304,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "networkpolicy hermes-default-deny",
       "id": "hermes_networkpolicy_deny"
     },
@@ -1552,7 +1317,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "networkpolicy hermes-allow-required-egress",
       "id": "hermes_networkpolicy_egress"
     },
@@ -1565,7 +1330,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "pvc hermes-data (longhorn 10gi)",
       "id": "hermes_pvc_data"
     },
@@ -1578,7 +1343,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "role hermes-autonomy-lease",
       "id": "hermes_rbac_lease_role"
     },
@@ -1591,7 +1356,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "rolebinding hermes-autonomy-lease",
       "id": "hermes_rbac_lease_rolebinding"
     },
@@ -1604,7 +1369,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "service hermes (port 8642)",
       "id": "hermes_service_api"
     },
@@ -1617,7 +1382,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 3,
+      "community": 7,
       "norm_label": "serviceaccount hermes-autonomy",
       "id": "hermes_serviceaccount_autonomy"
     },
@@ -1695,7 +1460,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "pihole kustomization",
       "id": "pihole_kustomization"
     },
@@ -1708,7 +1473,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "namespace pihole",
       "id": "pihole_namespace"
     },
@@ -1721,7 +1486,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "helmrelease pihole (chart 2.x, mojo2600)",
       "id": "pihole_helmrelease"
     },
@@ -1734,7 +1499,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "configmap pihole-values",
       "id": "pihole_values_configmap"
     },
@@ -1747,7 +1512,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 3,
       "norm_label": "pihole .lan dns resolver (192.168.1.205)",
       "id": "pihole_dns_lan_resolver"
     },
@@ -1786,7 +1551,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 20,
       "norm_label": "deployment plan-assistant-frontend",
       "id": "plan_assistant_frontend_deployment"
     },
@@ -1799,7 +1564,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 20,
       "norm_label": "configmap frontend-nginx-config",
       "id": "plan_assistant_frontend_nginx_configmap"
     },
@@ -1825,7 +1590,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 20,
       "norm_label": "imagerepository plan-assistant-frontend",
       "id": "plan_assistant_image_policy_frontend_repo"
     },
@@ -1851,7 +1616,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 20,
       "norm_label": "imagepolicy frontend-image-policy",
       "id": "plan_assistant_image_policy_frontend_policy"
     },
@@ -2046,7 +1811,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
+      "community": 1,
       "norm_label": "prometheus-values configmap",
       "id": "prometheus_values"
     },
@@ -2137,7 +1902,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "adr 0001: github work queue for hermes autonomy",
       "id": "adr_0001_github_work_queue"
     },
@@ -2150,7 +1915,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "kvarnberg-labs/hermes-work-queue repository",
       "id": "adr_0001_hermes_work_queue_repo"
     },
@@ -2163,7 +1928,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "hermes github app (credential identity)",
       "id": "adr_0001_hermes_github_app"
     },
@@ -2176,7 +1941,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "hourly queue-scanner cronjob (45m deadline)",
       "id": "adr_0001_hourly_cronjob_scanner"
     },
@@ -2189,7 +1954,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "fast preflight poll cronjob (5m, github-only)",
       "id": "adr_0001_fast_preflight_cronjob"
     },
@@ -2202,7 +1967,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "global implementation lock (kubernetes lease)",
       "id": "adr_0001_implementation_lock_lease"
     },
@@ -2215,7 +1980,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "command safety boundary (scoped auto-approval)",
       "id": "adr_0001_command_safety_boundary"
     },
@@ -2228,7 +1993,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "shared hermes pvc workspaces (/opt/data, 10gib)",
       "id": "adr_0001_shared_hermes_pvc_workspaces"
     },
@@ -2241,7 +2006,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "hermes issue label set (hermes-ready..hermes-done)",
       "id": "adr_0001_hermes_issue_label_set"
     },
@@ -2254,7 +2019,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "github as work source of truth",
       "id": "adr_0001_github_source_of_truth"
     },
@@ -2267,7 +2032,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "gitops change boundary (user keeps merge authority)",
       "id": "adr_0001_gitops_change_boundary"
     },
@@ -2280,7 +2045,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 8,
+      "community": 6,
       "norm_label": "addendum: github app workflows:write scope",
       "id": "adr_0001_workflows_write_addendum"
     },
@@ -2358,7 +2123,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "longhorn helmrepository",
       "id": "controllers_longhorn_helmrepo_repo"
     },
@@ -2371,7 +2136,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "charts.longhorn.io (http helm chart source)",
       "id": "controllers_longhorn_helmrepo_url"
     },
@@ -2384,7 +2149,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "flux source.toolkit.fluxcd.io/v1 helmrepository",
       "id": "controllers_flux_source_helmrepository_kind"
     },
@@ -2397,7 +2162,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "mojo2600 helmrepository",
       "id": "controllers_mojo2600_helmrepo_repo"
     },
@@ -2410,7 +2175,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "mojo2600.github.io/pihole-kubernetes (http helm chart source)",
       "id": "controllers_mojo2600_helmrepo_url"
     },
@@ -2423,7 +2188,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "n8n helmrepository (oci)",
       "id": "controllers_n8n_helmrepo_repo"
     },
@@ -2436,7 +2201,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "oci helmrepository type",
       "id": "controllers_n8n_helmrepo_oci_type"
     },
@@ -2449,7 +2214,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "8gears.container-registry.com/library (oci helm chart source)",
       "id": "controllers_n8n_helmrepo_url"
     },
@@ -2462,7 +2227,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "prometheus-community helmrepository",
       "id": "controllers_prometheus_helmrepo_repo"
     },
@@ -2475,7 +2240,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "prometheus-community.github.io/helm-charts (http helm chart source)",
       "id": "controllers_prometheus_helmrepo_url"
     },
@@ -2488,7 +2253,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "sealed-secrets helmrelease",
       "id": "controllers_sealed_secrets_helmrelease_release"
     },
@@ -2501,7 +2266,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "sealed-secrets-controller (fullnameoverride)",
       "id": "controllers_sealed_secrets_helmrelease_controller"
     },
@@ -2514,7 +2279,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "install/upgrade remediation retries: 3",
       "id": "controllers_sealed_secrets_helmrelease_remediation"
     },
@@ -2527,7 +2292,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "flux helm.toolkit.fluxcd.io/v2 helmrelease",
       "id": "controllers_flux_helm_helmrelease_kind"
     },
@@ -2540,7 +2305,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "sealed-secrets helmrepository",
       "id": "controllers_sealed_secrets_helmrepo_repo"
     },
@@ -2553,7 +2318,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 5,
+      "community": 4,
       "norm_label": "bitnami.github.io/sealed-secrets (http helm chart source)",
       "id": "controllers_sealed_secrets_helmrepo_url"
     },
@@ -2566,7 +2331,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "add-app eval: deploy vaultwarden via oci helm chart",
       "id": "evals_evals_add_app_vaultwarden"
     },
@@ -2579,7 +2344,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "debug-live-image eval: act-runner pod stuck in init:0/1",
       "id": "evals_evals_debug_live_image_init_container"
     },
@@ -2592,7 +2357,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "debug-live-image eval: plan-assistant-backend crashloopbackoff",
       "id": "evals_evals_debug_live_image_crashloop"
     },
@@ -2605,7 +2370,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "debug-live-image eval: frontend pod 0/1 ready readiness probe failure",
       "id": "evals_evals_debug_live_image_readiness_probe"
     },
@@ -2618,7 +2383,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "grill-me eval: add nextcloud to homelab",
       "id": "evals_evals_grill_me_nextcloud"
     },
@@ -2631,7 +2396,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "forgejo grafana dashboard",
       "id": "dashboards_forgejo_dashboard"
     },
@@ -2644,7 +2409,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "prometheus datasource (forgejo dashboard)",
       "id": "dashboards_forgejo_datasource_prometheus"
     },
@@ -2657,7 +2422,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "forgejo stats panels (repositories, users, goroutines, memory)",
       "id": "dashboards_forgejo_panels_stats"
     },
@@ -2670,7 +2435,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "forgejo timeseries panels (cpu usage, gc duration)",
       "id": "dashboards_forgejo_panels_timeseries"
     },
@@ -2683,7 +2448,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "forgejo (git service)",
       "id": "concept_forgejo_service"
     },
@@ -2696,7 +2461,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "node exporter full grafana dashboard",
       "id": "dashboards_k3s_nodes_dashboard"
     },
@@ -2709,7 +2474,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "prometheus datasource (k3s-nodes dashboard)",
       "id": "dashboards_k3s_nodes_datasource_prometheus"
     },
@@ -2722,7 +2487,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "k3s nodes quick cpu / mem / disk panel group",
       "id": "dashboards_k3s_nodes_panels_cpu_mem_disk"
     },
@@ -2735,7 +2500,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "k3s nodes pressure (psi) panel group",
       "id": "dashboards_k3s_nodes_panels_pressure"
     },
@@ -2748,7 +2513,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "k3s cluster nodes",
       "id": "concept_k3s_nodes"
     },
@@ -2761,7 +2526,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "kubernetes dashboard (overview)",
       "id": "dashboards_kubernetes_overview_dashboard"
     },
@@ -2774,7 +2539,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "prometheus datasource (kubernetes-overview dashboard)",
       "id": "dashboards_kubernetes_overview_datasource_prometheus"
     },
@@ -2787,7 +2552,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "kubernetes overview global cpu usage panel",
       "id": "dashboards_kubernetes_overview_panels_cpu"
     },
@@ -2800,7 +2565,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "kubernetes overview nodes / pods / namespaces panels",
       "id": "dashboards_kubernetes_overview_panels_nodes"
     },
@@ -2813,7 +2578,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 6,
+      "community": 5,
       "norm_label": "kubernetes cluster",
       "id": "concept_kubernetes_cluster"
     },
@@ -2826,7 +2591,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 15,
       "norm_label": "n8n grafana dashboard",
       "id": "dashboards_n8n_dashboard"
     },
@@ -2839,7 +2604,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 15,
       "norm_label": "prometheus datasource (n8n dashboard)",
       "id": "dashboards_n8n_datasource_prometheus"
     },
@@ -2852,7 +2617,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 15,
       "norm_label": "n8n pod cpu and memory panels",
       "id": "dashboards_n8n_panels_pod_cpu_mem"
     },
@@ -2865,7 +2630,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 15,
       "norm_label": "n8n container restarts panel",
       "id": "dashboards_n8n_panels_container_restarts"
     },
@@ -2878,7 +2643,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 13,
+      "community": 15,
       "norm_label": "n8n (workflow automation service)",
       "id": "concept_n8n_service"
     },
@@ -2891,7 +2656,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 16,
       "norm_label": "pi-hole exporter grafana dashboard",
       "id": "dashboards_pihole_dashboard"
     },
@@ -2904,7 +2669,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 16,
       "norm_label": "prometheus datasource (pihole dashboard)",
       "id": "dashboards_pihole_datasource_prometheus"
     },
@@ -2917,7 +2682,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 16,
       "norm_label": "pi-hole status / domains blocked panels",
       "id": "dashboards_pihole_panels_status"
     },
@@ -2930,7 +2695,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 16,
       "norm_label": "pi-hole top queries panel group",
       "id": "dashboards_pihole_panels_queries"
     },
@@ -2943,61 +2708,522 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 16,
       "norm_label": "pi-hole (dns ad-blocker service)",
       "id": "concept_pihole_service"
     },
     {
       "label": "Prometheus scrape job: forgejo",
       "file_type": "concept",
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[0]",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
-      "id": "prometheus_prometheus_values_forgejo_scrape_job",
-      "norm_label": "prometheus scrape job: forgejo"
+      "community": 11,
+      "norm_label": "prometheus scrape job: forgejo",
+      "id": "prometheus_prometheus_values_forgejo_scrape_job"
     },
     {
       "label": "Forgejo metrics endpoint (forgejo-http.forgejo.svc.cluster.local:3000/metrics)",
       "file_type": "concept",
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[0].static_configs[0].targets[0]",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
-      "id": "prometheus_prometheus_values_forgejo_metrics_endpoint",
-      "norm_label": "forgejo metrics endpoint (forgejo-http.forgejo.svc.cluster.local:3000/metrics)"
+      "community": 11,
+      "norm_label": "forgejo metrics endpoint (forgejo-http.forgejo.svc.cluster.local:3000/metrics)",
+      "id": "prometheus_prometheus_values_forgejo_metrics_endpoint"
     },
     {
       "label": "Prometheus scrape job: pihole",
       "file_type": "concept",
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[1]",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
-      "id": "prometheus_prometheus_values_pihole_scrape_job",
-      "norm_label": "prometheus scrape job: pihole"
+      "community": 3,
+      "norm_label": "prometheus scrape job: pihole",
+      "id": "prometheus_prometheus_values_pihole_scrape_job"
     },
     {
       "label": "Pihole exporter pod target (port 9617, container=exporter)",
       "file_type": "concept",
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[1].kubernetes_sd_configs",
       "source_url": null,
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 7,
-      "id": "prometheus_prometheus_values_pihole_exporter_pod_target",
-      "norm_label": "pihole exporter pod target (port 9617, container=exporter)"
+      "community": 3,
+      "norm_label": "pihole exporter pod target (port 9617, container=exporter)",
+      "id": "prometheus_prometheus_values_pihole_exporter_pod_target"
+    },
+    {
+      "label": "Act Runner Deployment",
+      "file_type": "code",
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "metadata.name=act-runner",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "act_runner_deployment_actrunnerdeployment",
+      "community": 8,
+      "norm_label": "act runner deployment"
+    },
+    {
+      "label": "Forgejo Runner Container",
+      "file_type": "code",
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "containers[0].name=runner",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "act_runner_deployment_forgejorunner",
+      "community": 8,
+      "norm_label": "forgejo runner container"
+    },
+    {
+      "label": "Docker-in-Docker Sidecar",
+      "file_type": "code",
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "containers[1].name=dind",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "act_runner_deployment_dindsidecar",
+      "community": 8,
+      "norm_label": "docker-in-docker sidecar"
+    },
+    {
+      "label": "Act Runner Register InitContainer",
+      "file_type": "code",
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "initContainers[0].name=register",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "act_runner_deployment_registerinit",
+      "community": 8,
+      "norm_label": "act runner register initcontainer"
+    },
+    {
+      "label": "Act Runner Data PVC",
+      "file_type": "code",
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "volumes[0].persistentVolumeClaim.claimName=act-runner-data",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "act_runner_deployment_runnerdatapvc",
+      "community": 8,
+      "norm_label": "act runner data pvc"
+    },
+    {
+      "label": "Act Runner Secret (Registration Token)",
+      "file_type": "code",
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "initContainers[0].env.secretKeyRef.name=act-runner-secret",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "act_runner_deployment_actrunnersecret",
+      "community": 8,
+      "norm_label": "act runner secret (registration token)"
+    },
+    {
+      "label": "Forgejo LAN Host Alias (192.168.1.205)",
+      "file_type": "rationale",
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "spec.template.spec.hostAliases",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "k3s node uses 1.1.1.1 DNS, not pihole, so .lan hostnames do not resolve without explicit host alias injection",
+      "id": "act_runner_deployment_forgejolan",
+      "community": 8,
+      "norm_label": "forgejo lan host alias (192.168.1.205)"
+    },
+    {
+      "label": "Docker Host TCP Config",
+      "file_type": "rationale",
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "initContainers[0] sed docker_host",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Uses host networking for job containers so they can reach DinD at localhost:2375",
+      "id": "act_runner_deployment_dockerhostconfig",
+      "community": 8,
+      "norm_label": "docker host tcp config"
+    },
+    {
+      "label": "Docker Daemon ConfigMap",
+      "file_type": "code",
+      "source_file": "apps/act-runner/docker-daemon-configmap.yaml",
+      "source_location": "metadata.name=docker-daemon-config",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "docker_daemon_configmap_dockerdaemonconfig",
+      "community": 8,
+      "norm_label": "docker daemon configmap"
+    },
+    {
+      "label": "Insecure Registries Config (forgejo.lan)",
+      "file_type": "rationale",
+      "source_file": "apps/act-runner/docker-daemon-configmap.yaml",
+      "source_location": "data.daemon.json.insecure-registries",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Allows DinD to pull/push to forgejo.lan and 10.43.4.61:3000 over HTTP without TLS verification, enabling act-runner to push built images to the internal Forgejo registry",
+      "id": "docker_daemon_configmap_insecureregistries",
+      "community": 8,
+      "norm_label": "insecure registries config (forgejo.lan)"
+    },
+    {
+      "label": "Hermes Autonomy Queue CronJob",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "metadata.name=hermes-autonomy-queue",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_queuecronjob",
+      "community": 2,
+      "norm_label": "hermes autonomy queue cronjob"
+    },
+    {
+      "label": "Hermes Autonomy Review Poll CronJob",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "metadata.name=hermes-autonomy-review-poll",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "community": 2,
+      "norm_label": "hermes autonomy review poll cronjob"
+    },
+    {
+      "label": "Hermes Agent Image (forgejo.lan/kvarnberg/hermes-agent)",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "containers[0].image=forgejo.lan/kvarnberg/hermes-agent:main-f055f612c",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_hermesagentimage",
+      "community": 2,
+      "norm_label": "hermes agent image (forgejo.lan/kvarnberg/hermes-agent)"
+    },
+    {
+      "label": "Hermes Config ConfigMap",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[0].configMapRef.name=hermes-config",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_hermesconfig",
+      "community": 2,
+      "norm_label": "hermes config configmap"
+    },
+    {
+      "label": "Hermes Autonomy Config ConfigMap",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[1].configMapRef.name=hermes-autonomy-config",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_hermesautonomyconfig",
+      "community": 2,
+      "norm_label": "hermes autonomy config configmap"
+    },
+    {
+      "label": "Hermes Discord Secret",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[2].secretRef.name=hermes-discord-secret",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_hermesdiscordsecret",
+      "community": 2,
+      "norm_label": "hermes discord secret"
+    },
+    {
+      "label": "Hermes Model Secret",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[3].secretRef.name=hermes-model-secret",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_hermesmodelsecret",
+      "community": 2,
+      "norm_label": "hermes model secret"
+    },
+    {
+      "label": "Hermes GitHub App Secret",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[4].secretRef.name=hermes-github-app-secret",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_hermesgithubappsecret",
+      "community": 2,
+      "norm_label": "hermes github app secret"
+    },
+    {
+      "label": "Hermes Data PVC",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[0].persistentVolumeClaim.claimName=hermes-data",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_hermesdatapvc",
+      "community": 2,
+      "norm_label": "hermes data pvc"
+    },
+    {
+      "label": "Hermes Autonomy Prompts ConfigMap",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[1].configMap.name=hermes-autonomy-prompts",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_autonomypromptscm",
+      "community": 2,
+      "norm_label": "hermes autonomy prompts configmap"
+    },
+    {
+      "label": "Hermes Autonomy Scripts ConfigMap",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[2].configMap.name=hermes-autonomy-scripts",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_autonomyscriptscm",
+      "community": 2,
+      "norm_label": "hermes autonomy scripts configmap"
+    },
+    {
+      "label": "Hermes GitHub Tools ConfigMap",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[4].configMap.name=hermes-github-tools",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_githoobtoolscm",
+      "community": 2,
+      "norm_label": "hermes github tools configmap"
+    },
+    {
+      "label": "Hermes Autonomy ServiceAccount",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "spec.serviceAccountName=hermes-autonomy",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_hermesautonomysa",
+      "community": 2,
+      "norm_label": "hermes autonomy serviceaccount"
+    },
+    {
+      "label": "Autonomy Trigger Queue Script",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "args: autonomy_trigger.py queue",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_autonomytriggerqueue",
+      "community": 2,
+      "norm_label": "autonomy trigger queue script"
+    },
+    {
+      "label": "Autonomy Trigger Fast-Poll Script",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "args: autonomy_trigger.py fast-poll",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_autonomytriggerfastpoll",
+      "community": 2,
+      "norm_label": "autonomy trigger fast-poll script"
+    },
+    {
+      "label": "Install GitHub CLI InitContainer",
+      "file_type": "code",
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "initContainers[0].name=install-github-cli",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_autonomy_cronjobs_installghclinit",
+      "community": 2,
+      "norm_label": "install github cli initcontainer"
+    },
+    {
+      "label": "Hermes Deployment",
+      "file_type": "code",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "metadata.name=hermes",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_deployment_hermesdeployment",
+      "community": 2,
+      "norm_label": "hermes deployment"
+    },
+    {
+      "label": "Hermes Gateway Container",
+      "file_type": "code",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "containers[0].args=[gateway, run]",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_deployment_hermesgateway",
+      "community": 2,
+      "norm_label": "hermes gateway container"
+    },
+    {
+      "label": "Configure Hermes InitContainer",
+      "file_type": "code",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "initContainers[2].name=configure-hermes",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_deployment_configurehermesinit",
+      "community": 2,
+      "norm_label": "configure hermes initcontainer"
+    },
+    {
+      "label": "Fix Data Permissions InitContainer",
+      "file_type": "code",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "initContainers[0].name=fix-data-permissions",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_deployment_fixpermissionsinit",
+      "community": 2,
+      "norm_label": "fix data permissions initcontainer"
+    },
+    {
+      "label": "Auxiliary Task Model Config",
+      "file_type": "rationale",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "initContainers[2] auxiliary task config loop",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Auxiliary tasks use opencode-go + deepseek-v4-flash (cheap, no extra billing) to fix recurring OpenRouter payment errors from provider auto routing",
+      "id": "hermes_deployment_auxiliarytaskconfig",
+      "community": 2,
+      "norm_label": "auxiliary task model config"
+    },
+    {
+      "label": "Tool Loop Guardrails Config",
+      "file_type": "rationale",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "configure-hermes: tool_loop_guardrails.hard_stop_enabled",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Loop safety: stops runaway same-tool retries gracefully",
+      "id": "hermes_deployment_toolloopguardrails",
+      "community": 2,
+      "norm_label": "tool loop guardrails config"
+    },
+    {
+      "label": "Memory Char Limit Config",
+      "file_type": "rationale",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "configure-hermes: memory.memory_char_limit=8000",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Memory limit raised to 8000 chars so agent stops looping on 'would exceed the limit'",
+      "id": "hermes_deployment_memorylimitconfig",
+      "community": 2,
+      "norm_label": "memory char limit config"
+    },
+    {
+      "label": "Hermes API Secret",
+      "file_type": "code",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "envFrom.secretRef.name=hermes-api-secret",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_deployment_hermesapisecret",
+      "community": 2,
+      "norm_label": "hermes api secret"
+    },
+    {
+      "label": "OpenCode-Go Provider Config",
+      "file_type": "concept",
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "annotation hermes.kvarnberg.io/config-generation=opencode-go-deepseek-v4-pro-2026-06-22b",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "id": "hermes_deployment_opencodegoconfig",
+      "community": 2,
+      "norm_label": "opencode-go provider config"
     }
   ],
   "links": [
@@ -3044,12 +3270,32 @@
     {
       "relation": "references",
       "confidence": "EXTRACTED",
+      "confidence_score": 0.9,
+      "source_file": "AGENTS.md",
+      "source_location": "Available project skills",
+      "weight": 0.8,
+      "source": "add_app_skill",
+      "target": "agents_md_startup_guide"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
       "confidence_score": 0.85,
       "source_file": ".claude/skills/add-app/SKILL.md",
       "source_location": "Step 8",
       "weight": 0.7,
       "source": "add_app_skill",
       "target": "claude_md_lan_dns_convention"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "CLAUDE.md",
+      "source_location": "Skills",
+      "weight": 0.9,
+      "source": "add_app_skill",
+      "target": "claude_md_project_guide"
     },
     {
       "relation": "invokes",
@@ -3070,26 +3316,6 @@
       "weight": 1.0,
       "source": "add_app_skill",
       "target": "seal_secret_skill"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "AGENTS.md",
-      "source_location": "Available project skills",
-      "weight": 0.8,
-      "source": "add_app_skill",
-      "target": "agents_md_startup_guide"
-    },
-    {
-      "relation": "references",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.95,
-      "source_file": "CLAUDE.md",
-      "source_location": "Skills",
-      "weight": 0.9,
-      "source": "add_app_skill",
-      "target": "claude_md_project_guide"
     },
     {
       "relation": "references",
@@ -3252,16 +3478,6 @@
       "target": "deploy_raw_app_skill"
     },
     {
-      "relation": "applies",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": "--instance forgejo-http.forgejo.svc.cluster.local",
-      "weight": 0.9,
-      "source": "debug_live_image_in_cluster_dns",
-      "target": "act_runner_register_initcontainer"
-    },
-    {
       "relation": "semantically_similar_to",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
@@ -3280,16 +3496,6 @@
       "weight": 1.0,
       "source": "debug_live_image_in_cluster_dns",
       "target": "debug_live_image_eval1"
-    },
-    {
-      "relation": "describes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.95,
-      "source_file": ".claude/skills/debug-live-image/evals/eval-1-with-skill-output.md",
-      "source_location": "Root cause",
-      "weight": 0.95,
-      "source": "debug_live_image_eval1",
-      "target": "act_runner_register_initcontainer"
     },
     {
       "relation": "references",
@@ -3360,16 +3566,6 @@
       "weight": 1.0,
       "source": "deploy_raw_app_skill",
       "target": "seal_secret_skill"
-    },
-    {
-      "relation": "supports",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "apps/act-runner/docker-daemon-configmap.yaml",
-      "source_location": "insecure-registries forgejo.lan",
-      "weight": 0.7,
-      "source": "deploy_raw_app_forgejo_registry",
-      "target": "act_runner_docker_daemon_configmap"
     },
     {
       "relation": "references",
@@ -3652,16 +3848,6 @@
       "target": "context_hermes_github_app"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "CONTEXT.md",
-      "source_location": "Relationships",
-      "weight": 1.0,
-      "source": "context_github_work_queue",
-      "target": "context_hermes_work_item"
-    },
-    {
       "relation": "polls",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -3670,6 +3856,16 @@
       "weight": 1.0,
       "source": "context_github_work_queue",
       "target": "context_hermes_cli_work_trigger"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CONTEXT.md",
+      "source_location": "Relationships",
+      "weight": 1.0,
+      "source": "context_github_work_queue",
+      "target": "context_hermes_work_item"
     },
     {
       "relation": "produces",
@@ -3762,96 +3958,6 @@
       "target": "cycling_training_app_configmap"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "act_runner_deployment",
-      "target": "act_runner_dind_sidecar"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "act_runner_deployment",
-      "target": "act_runner_register_initcontainer"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "act_runner_deployment",
-      "target": "act_runner_runner_container"
-    },
-    {
-      "relation": "includes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/act-runner/kustomization.yaml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "act_runner_deployment",
-      "target": "act_runner_kustomization"
-    },
-    {
-      "relation": "consumes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": "REGISTRATION_TOKEN",
-      "weight": 1.0,
-      "source": "act_runner_register_initcontainer",
-      "target": "act_runner_sealed_secret_ref"
-    },
-    {
-      "relation": "mounts",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": "docker-daemon-config volumeMount",
-      "weight": 1.0,
-      "source": "act_runner_dind_sidecar",
-      "target": "act_runner_docker_daemon_configmap"
-    },
-    {
-      "relation": "depends_on",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.95,
-      "source_file": "apps/act-runner/deployment.yaml",
-      "source_location": "DOCKER_HOST tcp://localhost:2375",
-      "weight": 0.95,
-      "source": "act_runner_dind_sidecar",
-      "target": "act_runner_runner_container"
-    },
-    {
-      "relation": "includes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "apps/act-runner/kustomization.yaml",
-      "source_location": "act-runner-sealed-secret.yaml",
-      "weight": 0.9,
-      "source": "act_runner_sealed_secret_ref",
-      "target": "act_runner_kustomization"
-    },
-    {
-      "relation": "includes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/act-runner/kustomization.yaml",
-      "source_location": null,
-      "weight": 1.0,
-      "source": "act_runner_docker_daemon_configmap",
-      "target": "act_runner_kustomization"
-    },
-    {
       "relation": "includes",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -3892,6 +3998,16 @@
       "target": "cycling_training_app_secrets_ref"
     },
     {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/cycling-training-app/kustomization.yaml",
+      "source_location": "resources",
+      "weight": 1.0,
+      "source": "cycling_training_app_ingress_ingress",
+      "target": "cycling_training_app_kustomization_kustomization"
+    },
+    {
       "relation": "deployed_in",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -3910,16 +4026,6 @@
       "weight": 1.0,
       "source": "cycling_training_app_ingress_ingress",
       "target": "cycling_training_app_service_service"
-    },
-    {
-      "relation": "includes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/cycling-training-app/kustomization.yaml",
-      "source_location": "resources",
-      "weight": 1.0,
-      "source": "cycling_training_app_ingress_ingress",
-      "target": "cycling_training_app_kustomization_kustomization"
     },
     {
       "relation": "includes",
@@ -3982,6 +4088,16 @@
       "target": "forgejo_forgejo_values_configmap"
     },
     {
+      "relation": "includes",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/forgejo/kustomization.yaml",
+      "source_location": "resources",
+      "weight": 1.0,
+      "source": "forgejo_forgejo_helmrelease_helmrelease",
+      "target": "forgejo_kustomization_kustomization"
+    },
+    {
       "relation": "values_from",
       "confidence": "EXTRACTED",
       "confidence_score": 0.9,
@@ -4002,24 +4118,24 @@
       "target": "forgejo_namespace_namespace"
     },
     {
+      "relation": "served_by",
+      "confidence": "INFERRED",
+      "confidence_score": 0.95,
+      "source_file": "apps/prometheus/prometheus-values.yaml",
+      "source_location": null,
+      "weight": 0.95,
+      "source": "forgejo_forgejo_helmrelease_helmrelease",
+      "target": "prometheus_prometheus_values_forgejo_metrics_endpoint"
+    },
+    {
       "relation": "includes",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "apps/forgejo/kustomization.yaml",
       "source_location": "resources",
       "weight": 1.0,
-      "source": "forgejo_forgejo_helmrelease_helmrelease",
+      "source": "forgejo_forgejo_values_configmap",
       "target": "forgejo_kustomization_kustomization"
-    },
-    {
-      "relation": "served_by",
-      "confidence": "INFERRED",
-      "confidence_score": 0.95,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
-      "source_location": null,
-      "weight": 0.95,
-      "source": "forgejo_forgejo_helmrelease_helmrelease",
-      "target": "prometheus_prometheus_values_forgejo_metrics_endpoint"
     },
     {
       "relation": "semantically_similar_to",
@@ -4030,16 +4146,6 @@
       "weight": 0.5,
       "source": "forgejo_forgejo_values_configmap",
       "target": "hermes_work_queue_repo"
-    },
-    {
-      "relation": "includes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/forgejo/kustomization.yaml",
-      "source_location": "resources",
-      "weight": 1.0,
-      "source": "forgejo_forgejo_values_configmap",
-      "target": "forgejo_kustomization_kustomization"
     },
     {
       "relation": "includes",
@@ -4065,7 +4171,7 @@
       "relation": "targets_namespace",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[0].static_configs[0].targets[0]",
       "weight": 1.0,
       "source": "forgejo_namespace_namespace",
@@ -4112,16 +4218,6 @@
       "target": "grafana_grafana_values_configmap"
     },
     {
-      "relation": "deployed_in",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/grafana/grafana-helmrelease.yaml",
-      "source_location": "metadata.namespace",
-      "weight": 1.0,
-      "source": "grafana_grafana_helmrelease_helmrelease",
-      "target": "grafana_namespace_namespace"
-    },
-    {
       "relation": "includes",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -4130,6 +4226,16 @@
       "weight": 1.0,
       "source": "grafana_grafana_helmrelease_helmrelease",
       "target": "grafana_kustomization_kustomization"
+    },
+    {
+      "relation": "deployed_in",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/grafana/grafana-helmrelease.yaml",
+      "source_location": "metadata.namespace",
+      "weight": 1.0,
+      "source": "grafana_grafana_helmrelease_helmrelease",
+      "target": "grafana_namespace_namespace"
     },
     {
       "relation": "configures",
@@ -4155,7 +4261,7 @@
       "relation": "provides_datasource",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": null,
       "weight": 0.85,
       "source": "grafana_grafana_values_prometheus_datasource",
@@ -4192,36 +4298,6 @@
       "target": "hermes_work_queue_repo"
     },
     {
-      "relation": "uses_config",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "envFrom configMapRef hermes-autonomy-config",
-      "weight": 1.0,
-      "source": "hermes_autonomy_configmap_config",
-      "target": "hermes_autonomy_cronjobs_queue"
-    },
-    {
-      "relation": "uses_config",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "envFrom configMapRef hermes-autonomy-config",
-      "weight": 1.0,
-      "source": "hermes_autonomy_configmap_config",
-      "target": "hermes_autonomy_cronjobs_review_poll"
-    },
-    {
-      "relation": "uses_config",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/deployment.yaml",
-      "source_location": "envFrom configMapRef hermes-autonomy-config",
-      "weight": 1.0,
-      "source": "hermes_autonomy_configmap_config",
-      "target": "hermes_deployment_deployment"
-    },
-    {
       "relation": "authenticates_as",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
@@ -4240,106 +4316,6 @@
       "weight": 1.0,
       "source": "hermes_github_app",
       "target": "hermes_github_tools_configmap"
-    },
-    {
-      "relation": "mounts",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "volumes autonomy-prompts",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_queue",
-      "target": "hermes_autonomy_prompts_configmap"
-    },
-    {
-      "relation": "uses",
-      "confidence": "INFERRED",
-      "confidence_score": 0.9,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "HERMES_QUEUE_PROMPT_PATH",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_queue",
-      "target": "hermes_autonomy_prompts_queue_scanner"
-    },
-    {
-      "relation": "mounts",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "volumes autonomy-scripts",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_queue",
-      "target": "hermes_autonomy_scripts_configmap"
-    },
-    {
-      "relation": "executes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "args autonomy_trigger.py queue",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_queue",
-      "target": "hermes_autonomy_scripts_trigger"
-    },
-    {
-      "relation": "uses_config",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "envFrom configMapRef hermes-config",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_queue",
-      "target": "hermes_configmap_config"
-    },
-    {
-      "relation": "mounts",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "volumes github-tools",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_queue",
-      "target": "hermes_github_tools_configmap"
-    },
-    {
-      "relation": "mounts",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "volumes autonomy-prompts",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_review_poll",
-      "target": "hermes_autonomy_prompts_configmap"
-    },
-    {
-      "relation": "uses",
-      "confidence": "INFERRED",
-      "confidence_score": 0.9,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "HERMES_REVIEW_PROMPT_PATH",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_review_poll",
-      "target": "hermes_autonomy_prompts_review_response"
-    },
-    {
-      "relation": "mounts",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "volumes autonomy-scripts",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_review_poll",
-      "target": "hermes_autonomy_scripts_configmap"
-    },
-    {
-      "relation": "executes",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
-      "source_location": "args autonomy_trigger.py fast-poll",
-      "weight": 1.0,
-      "source": "hermes_autonomy_cronjobs_review_poll",
-      "target": "hermes_autonomy_scripts_trigger"
     },
     {
       "relation": "contains",
@@ -4410,36 +4386,6 @@
       "weight": 1.0,
       "source": "hermes_autonomy_scripts_trigger",
       "target": "hermes_autonomy_scripts_lease_lock"
-    },
-    {
-      "relation": "uses_config",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/deployment.yaml",
-      "source_location": "envFrom configMapRef hermes-config",
-      "weight": 1.0,
-      "source": "hermes_configmap_config",
-      "target": "hermes_deployment_deployment"
-    },
-    {
-      "relation": "configures",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/deployment.yaml",
-      "source_location": "configure-hermes initContainer",
-      "weight": 1.0,
-      "source": "hermes_deployment_deployment",
-      "target": "hermes_deployment_aux_config"
-    },
-    {
-      "relation": "mounts",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "apps/hermes/deployment.yaml",
-      "source_location": "volumes github-tools",
-      "weight": 1.0,
-      "source": "hermes_deployment_deployment",
-      "target": "hermes_github_tools_configmap"
     },
     {
       "relation": "includes",
@@ -4765,7 +4711,7 @@
       "relation": "targets_namespace",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[1].kubernetes_sd_configs[0].namespaces.names[0]",
       "weight": 1.0,
       "source": "pihole_namespace",
@@ -4785,7 +4731,7 @@
       "relation": "served_by",
       "confidence": "INFERRED",
       "confidence_score": 0.95,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": null,
       "weight": 0.95,
       "source": "pihole_helmrelease",
@@ -4952,16 +4898,6 @@
       "target": "plan_assistant_services"
     },
     {
-      "relation": "selects",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.95,
-      "source_file": "apps/plan-assistant/services.yaml",
-      "source_location": "selector app=plan-assistant-postgres",
-      "weight": 1.0,
-      "source": "plan_assistant_postgres_statefulset",
-      "target": "plan_assistant_postgres_service"
-    },
-    {
       "relation": "uses_storageclass",
       "confidence": "INFERRED",
       "confidence_score": 0.85,
@@ -4970,6 +4906,16 @@
       "weight": 1.0,
       "source": "plan_assistant_postgres_statefulset",
       "target": "controllers_longhorn_helmrelease"
+    },
+    {
+      "relation": "selects",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "source_file": "apps/plan-assistant/services.yaml",
+      "source_location": "selector app=plan-assistant-postgres",
+      "weight": 1.0,
+      "source": "plan_assistant_postgres_statefulset",
+      "target": "plan_assistant_postgres_service"
     },
     {
       "relation": "reads_secret_from",
@@ -5095,7 +5041,7 @@
       "relation": "defines",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[0]",
       "weight": 1.0,
       "source": "prometheus_values",
@@ -5105,21 +5051,11 @@
       "relation": "defines",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[1]",
       "weight": 1.0,
       "source": "prometheus_values",
       "target": "prometheus_prometheus_values_pihole_scrape_job"
-    },
-    {
-      "relation": "reconciles_path",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "clusters/main/flux-system/gotk-sync.yaml",
-      "source_location": "path ./clusters/main",
-      "weight": 1.0,
-      "source": "main_apps_kustomization",
-      "target": "flux_system_kustomization"
     },
     {
       "relation": "uses_source",
@@ -5130,6 +5066,16 @@
       "weight": 1.0,
       "source": "main_apps_kustomization",
       "target": "flux_system_gitrepository"
+    },
+    {
+      "relation": "reconciles_path",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "clusters/main/flux-system/gotk-sync.yaml",
+      "source_location": "path ./clusters/main",
+      "weight": 1.0,
+      "source": "main_apps_kustomization",
+      "target": "flux_system_kustomization"
     },
     {
       "relation": "depends_on",
@@ -5172,16 +5118,6 @@
       "target": "main_infrastructure_controllers_kustomization"
     },
     {
-      "relation": "reconciles_path",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": "clusters/main/flux-system/gotk-sync.yaml",
-      "source_location": "path ./clusters/main",
-      "weight": 1.0,
-      "source": "flux_system_kustomization",
-      "target": "main_infrastructure_controllers_kustomization"
-    },
-    {
       "relation": "includes",
       "confidence": "EXTRACTED",
       "confidence_score": 0.9,
@@ -5192,14 +5128,14 @@
       "target": "main_flux_system_kustomization"
     },
     {
-      "relation": "depends_on",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "clusters/main/infrastructure.yaml",
-      "source_location": "dependsOn infrastructure-controllers",
+      "relation": "reconciles_path",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "clusters/main/flux-system/gotk-sync.yaml",
+      "source_location": "path ./clusters/main",
       "weight": 1.0,
-      "source": "main_infrastructure_controllers_kustomization",
-      "target": "main_infrastructure_configs_kustomization"
+      "source": "flux_system_kustomization",
+      "target": "main_infrastructure_controllers_kustomization"
     },
     {
       "relation": "reconciles_path",
@@ -5210,6 +5146,16 @@
       "weight": 1.0,
       "source": "main_infrastructure_controllers_kustomization",
       "target": "controllers_kustomization"
+    },
+    {
+      "relation": "depends_on",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "clusters/main/infrastructure.yaml",
+      "source_location": "dependsOn infrastructure-controllers",
+      "weight": 1.0,
+      "source": "main_infrastructure_controllers_kustomization",
+      "target": "main_infrastructure_configs_kustomization"
     },
     {
       "relation": "reconciles_path",
@@ -5855,7 +5801,7 @@
       "relation": "scrapes",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[0].static_configs[0].targets[0]",
       "weight": 1.0,
       "source": "prometheus_prometheus_values_forgejo_scrape_job",
@@ -5865,160 +5811,595 @@
       "relation": "scrapes",
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
-      "source_file": "/Users/johan/Documents/WS/homelab/apps/prometheus/prometheus-values.yaml",
+      "source_file": "apps/prometheus/prometheus-values.yaml",
       "source_location": "extraScrapeConfigs[1].kubernetes_sd_configs",
       "weight": 1.0,
       "source": "prometheus_prometheus_values_pihole_scrape_job",
       "target": "prometheus_prometheus_values_pihole_exporter_pod_target"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "containers[1]",
+      "weight": 1.0,
+      "source": "act_runner_deployment_actrunnerdeployment",
+      "target": "act_runner_deployment_dindsidecar"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "hostAliases",
+      "weight": 1.0,
+      "source": "act_runner_deployment_actrunnerdeployment",
+      "target": "act_runner_deployment_forgejolan"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "containers[0]",
+      "weight": 1.0,
+      "source": "act_runner_deployment_actrunnerdeployment",
+      "target": "act_runner_deployment_forgejorunner"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "initContainers[0]",
+      "weight": 1.0,
+      "source": "act_runner_deployment_actrunnerdeployment",
+      "target": "act_runner_deployment_registerinit"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "volumes[0]",
+      "weight": 1.0,
+      "source": "act_runner_deployment_actrunnerdeployment",
+      "target": "act_runner_deployment_runnerdatapvc"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "until wget localhost:2375/v1.43/info",
+      "weight": 1.0,
+      "source": "act_runner_deployment_forgejorunner",
+      "target": "act_runner_deployment_dindsidecar"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "env.DOCKER_HOST=tcp://localhost:2375",
+      "weight": 1.0,
+      "source": "act_runner_deployment_forgejorunner",
+      "target": "act_runner_deployment_dockerhostconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "volumeMounts.configMap=docker-daemon-config",
+      "weight": 1.0,
+      "source": "act_runner_deployment_dindsidecar",
+      "target": "docker_daemon_configmap_dockerdaemonconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": "env.secretKeyRef",
+      "weight": 1.0,
+      "source": "act_runner_deployment_registerinit",
+      "target": "act_runner_deployment_actrunnersecret"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "apps/act-runner/deployment.yaml",
+      "source_location": null,
+      "weight": 0.65,
+      "source": "act_runner_deployment_forgejolan",
+      "target": "hermes_deployment_hermesdeployment"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/docker-daemon-configmap.yaml",
+      "source_location": "data.daemon.json",
+      "weight": 1.0,
+      "source": "docker_daemon_configmap_dockerdaemonconfig",
+      "target": "docker_daemon_configmap_insecureregistries"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[1].configMap",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_autonomypromptscm"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[2].configMap",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_autonomyscriptscm"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "args: autonomy_trigger.py queue",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_autonomytriggerqueue"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[4].configMap",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_githoobtoolscm"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "containers[0].image",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_hermesagentimage"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[1].configMapRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_hermesautonomyconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "serviceAccountName",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_hermesautonomysa"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[0].configMapRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_hermesconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[0].persistentVolumeClaim",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_hermesdatapvc"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[2].secretRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_hermesdiscordsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[4].secretRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_hermesgithubappsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[3].secretRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_hermesmodelsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "initContainers[0]",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_autonomy_cronjobs_installghclinit"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": null,
+      "weight": 0.75,
+      "source": "hermes_autonomy_cronjobs_queuecronjob",
+      "target": "hermes_deployment_hermesdeployment"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "args: autonomy_trigger.py fast-poll",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_autonomytriggerfastpoll"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "containers[0].image",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_hermesagentimage"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[1].configMapRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_hermesautonomyconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "serviceAccountName",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_hermesautonomysa"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[0].configMapRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_hermesconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "volumes[0].persistentVolumeClaim",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_hermesdatapvc"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[2].secretRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_hermesdiscordsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[4].secretRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_hermesgithubappsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "envFrom[3].secretRef",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_hermesmodelsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": "initContainers[0]",
+      "weight": 1.0,
+      "source": "hermes_autonomy_cronjobs_reviewpollcronjob",
+      "target": "hermes_autonomy_cronjobs_installghclinit"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "containers[0].image=forgejo.lan/kvarnberg/hermes-agent:main-f055f612c",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_hermesagentimage"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "envFrom.configMapRef.name=hermes-config",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_hermesconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "envFrom.configMapRef.name=hermes-autonomy-config",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_hermesautonomyconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "envFrom.secretRef.name=hermes-discord-secret",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_hermesdiscordsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "envFrom.secretRef.name=hermes-model-secret",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_hermesmodelsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "envFrom.secretRef.name=hermes-github-app-secret",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_hermesgithubappsecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "volumes[0].persistentVolumeClaim.claimName=hermes-data",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_hermesdatapvc"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "volumes[2].configMap.name=hermes-github-tools",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_githoobtoolscm"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "serviceAccountName=hermes-autonomy",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_autonomy_cronjobs_hermesautonomysa"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "source_file": "apps/hermes/autonomy-cronjobs.yaml",
+      "source_location": null,
+      "weight": 0.65,
+      "source": "hermes_autonomy_cronjobs_installghclinit",
+      "target": "hermes_deployment_fixpermissionsinit"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "initContainers[2]",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_deployment_configurehermesinit"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "initContainers[0]",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_deployment_fixpermissionsinit"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "envFrom.secretRef.name=hermes-api-secret",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_deployment_hermesapisecret"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "containers[0]",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_deployment_hermesgateway"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "annotation hermes.kvarnberg.io/config-generation",
+      "weight": 1.0,
+      "source": "hermes_deployment_hermesdeployment",
+      "target": "hermes_deployment_opencodegoconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "auxiliary task config loop",
+      "weight": 1.0,
+      "source": "hermes_deployment_configurehermesinit",
+      "target": "hermes_deployment_auxiliarytaskconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "memory.memory_char_limit=8000",
+      "weight": 1.0,
+      "source": "hermes_deployment_configurehermesinit",
+      "target": "hermes_deployment_memorylimitconfig"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "tool_loop_guardrails.hard_stop_enabled",
+      "weight": 1.0,
+      "source": "hermes_deployment_configurehermesinit",
+      "target": "hermes_deployment_toolloopguardrails"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "apps/hermes/deployment.yaml",
+      "source_location": "auxiliary.$t.provider opencode-go",
+      "weight": 1.0,
+      "source": "hermes_deployment_auxiliarytaskconfig",
+      "target": "hermes_deployment_opencodegoconfig"
     }
   ],
   "hyperedges": [
     {
-      "label": ".lan DNS does not resolve in-cluster; use *.svc.cluster.local (CLAUDE.md convention, debug-live-image rule, act-runner init fix, eval-1 root cause)",
-      "members": [
-        "claude_md_lan_dns_convention",
-        "debug_live_image_in_cluster_dns",
-        "act_runner_register_initcontainer",
-        "debug_live_image_eval1"
-      ],
-      "relation": "participates_in",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": ".claude/skills/debug-live-image/SKILL.md"
-    },
-    {
-      "label": "Forgejo private-registry deploy flow (build/push image, registry pull SealedSecret, imagePullSecrets in Deployment)",
-      "members": [
-        "deploy_raw_app_forgejo_registry",
-        "deploy_raw_app_registry_pull_secret",
-        "seal_secret_skill",
-        "cycling_training_app_deployment",
-        "act_runner_docker_daemon_configmap"
-      ],
-      "relation": "participates_in",
-      "confidence": "INFERRED",
-      "confidence_score": 0.85,
-      "source_file": ".claude/skills/deploy-raw-app/SKILL.md"
-    },
-    {
-      "label": "Hermes autonomous coding loop (CLI Work Trigger + Fast Poll Trigger coordinate via Implementation Lock over the GitHub Work Queue)",
-      "members": [
-        "context_hermes_cli_work_trigger",
-        "context_fast_poll_trigger",
-        "context_implementation_lock",
-        "context_github_work_queue",
-        "context_shared_hermes_home"
-      ],
-      "relation": "participates_in",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "CONTEXT.md"
-    },
-    {
-      "label": "Grafana observability stack (HelmRelease \u2192 values \u2192 Prometheus datasource + dashboard sidecar discovering dashboard ConfigMaps)",
+      "id": "hermes_autonomy_shared_secrets",
+      "label": "Hermes Autonomy Shared Secrets and Config",
       "nodes": [
-        "grafana_grafana_helmrelease_helmrelease",
-        "grafana_grafana_values_configmap",
-        "grafana_grafana_values_prometheus_datasource",
-        "grafana_dashboards_dashboard_sidecar",
-        "grafana_dashboards_kustomization_kustomization"
+        "hermes_autonomy_cronjobs_hermesconfig",
+        "hermes_autonomy_cronjobs_hermesautonomyconfig",
+        "hermes_autonomy_cronjobs_hermesdiscordsecret",
+        "hermes_autonomy_cronjobs_hermesmodelsecret",
+        "hermes_autonomy_cronjobs_hermesgithubappsecret"
       ],
-      "relation": "stack",
+      "relation": "participate_in",
       "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "apps/grafana/grafana-values.yaml"
-    },
-    {
-      "label": "Hermes autonomy queue workflow (CronJob \u2192 config \u2192 prompt \u2192 trigger script \u2192 GitHub work queue under lease)",
-      "nodes": [
-        "hermes_autonomy_cronjobs_queue",
-        "hermes_autonomy_configmap_config",
-        "hermes_autonomy_prompts_queue_scanner",
-        "hermes_autonomy_scripts_trigger",
-        "hermes_work_queue_repo",
-        "hermes_autonomy_scripts_lease_lock"
-      ],
-      "relation": "workflow",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.95,
+      "confidence_score": 1.0,
       "source_file": "apps/hermes/autonomy-cronjobs.yaml"
     },
     {
-      "label": "Hermes fast review-poll workflow (CronJob \u2192 review-response prompt \u2192 trigger script fast-poll mode)",
+      "id": "act_runner_dind_pipeline",
+      "label": "Act Runner DinD CI Pipeline",
       "nodes": [
-        "hermes_autonomy_cronjobs_review_poll",
-        "hermes_autonomy_prompts_review_response",
-        "hermes_autonomy_scripts_trigger",
-        "hermes_github_app"
+        "act_runner_deployment_actrunnerdeployment",
+        "act_runner_deployment_dindsidecar",
+        "docker_daemon_configmap_dockerdaemonconfig"
       ],
-      "relation": "workflow",
+      "relation": "implement",
       "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "apps/hermes/autonomy-cronjobs.yaml"
+      "confidence_score": 1.0,
+      "source_file": "apps/act-runner/deployment.yaml"
     },
     {
-      "label": "Hermes autonomy identity grants cross-namespace access",
+      "id": "hermes_deployment_init_chain",
+      "label": "Hermes Deployment Init Container Chain",
       "nodes": [
-        "hermes_serviceaccount_autonomy",
-        "hermes_sandbox_rbac_rolebinding",
-        "hermes_rbac_lease_rolebinding"
+        "hermes_deployment_fixpermissionsinit",
+        "hermes_autonomy_cronjobs_installghclinit",
+        "hermes_deployment_configurehermesinit"
       ],
-      "relation": "rbac_grant_chain",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "apps/hermes/hermes-sandbox-rbac.yaml"
-    },
-    {
-      "label": "Plan-assistant Flux image automation flow",
-      "nodes": [
-        "plan_assistant_backend_deployment",
-        "plan_assistant_image_policy_backend_repo",
-        "plan_assistant_image_policy_backend_policy"
-      ],
-      "relation": "image_automation_pipeline",
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "apps/plan-assistant/image-policy.yaml"
-    },
-    {
-      "label": "plan-assistant three-tier app: frontend SPA + backend API + postgres, exposed via Ingress path routing",
-      "nodes": [
-        "plan_assistant_ingress",
-        "plan_assistant_frontend_service",
-        "plan_assistant_backend_service",
-        "plan_assistant_postgres_service",
-        "plan_assistant_postgres_statefulset"
-      ],
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.9,
-      "source_file": "apps/plan-assistant/ingress.yaml"
-    },
-    {
-      "label": "Flux reconciliation chain: GitRepository \u2192 flux-system Kustomization \u2192 infrastructure-controllers \u2192 infrastructure-configs \u2192 apps",
-      "nodes": [
-        "flux_system_gitrepository",
-        "flux_system_kustomization",
-        "main_infrastructure_controllers_kustomization",
-        "main_infrastructure_configs_kustomization",
-        "main_apps_kustomization"
-      ],
+      "relation": "form",
       "confidence": "EXTRACTED",
       "confidence_score": 0.95,
-      "source_file": "clusters/main/infrastructure.yaml"
-    },
-    {
-      "label": "Hermes autonomy: two CronJob triggers sharing a Lease lock and the Hermes PVC, driven by the GitHub work queue",
-      "nodes": [
-        "adr_0001_hourly_cronjob_scanner",
-        "adr_0001_fast_preflight_cronjob",
-        "adr_0001_implementation_lock_lease",
-        "adr_0001_shared_hermes_pvc_workspaces",
-        "adr_0001_hermes_work_queue_repo"
-      ],
-      "confidence": "EXTRACTED",
-      "confidence_score": 0.95,
-      "source_file": "docs/adr/0001-github-work-queue-for-hermes-autonomy.md"
+      "source_file": "apps/hermes/deployment.yaml"
     }
   ],
-  "built_at_commit": "e938b4ed7821f781c01517ed130fd30c9f69999f"
+  "built_at_commit": "c35a8749997ba75e4e0bad4513a3042985b8f5f9"
 }
