@@ -15,11 +15,13 @@ spec:
       backoffLimit: 0
       template:
         spec:
+          imagePullSecrets:
+            - name: forgejo-registry-secret
           serviceAccountName: hermes-autonomy
           restartPolicy: Never
           initContainers:
             - name: install-github-cli
-              image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
+              image: forgejo.lan/kvarnberg/hermes-agent:main-d61abb796
               imagePullPolicy: IfNotPresent
               command: ["/opt/hermes-github-tools/install-gh"]
               volumeMounts:
@@ -32,7 +34,7 @@ spec:
                   readOnly: true
           containers:
             - name: hermes
-              image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
+              image: forgejo.lan/kvarnberg/hermes-agent:main-d61abb796
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:
@@ -131,11 +133,13 @@ spec:
       backoffLimit: 0
       template:
         spec:
+          imagePullSecrets:
+            - name: forgejo-registry-secret
           serviceAccountName: hermes-autonomy
           restartPolicy: Never
           initContainers:
             - name: install-github-cli
-              image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
+              image: forgejo.lan/kvarnberg/hermes-agent:main-d61abb796
               imagePullPolicy: IfNotPresent
               command: ["/opt/hermes-github-tools/install-gh"]
               volumeMounts:
@@ -148,7 +152,7 @@ spec:
                   readOnly: true
           containers:
             - name: hermes
-              image: docker.io/nousresearch/hermes-agent@sha256:2bba4ab37729ebdd864d4caf277b24fec4cd8bfc2855185fd9f4c90f9bf7bfa3
+              image: forgejo.lan/kvarnberg/hermes-agent:main-d61abb796
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:

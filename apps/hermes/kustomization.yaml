@@ -10,6 +10,7 @@ resources:
   - serviceaccount.yaml
   - rbac.yaml
   - networkpolicy.yaml
+  - registry-sealed-secret.yaml
   - pvc.yaml
   - deployment.yaml
   - service.yaml

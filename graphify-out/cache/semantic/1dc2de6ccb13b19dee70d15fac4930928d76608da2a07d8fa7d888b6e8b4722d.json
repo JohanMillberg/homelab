@@ -1,0 +1,1 @@
+{"nodes": [{"id": "plan_assistant_frontend_nginx_configmap", "label": "ConfigMap frontend-nginx-config", "file_type": "code", "source_file": "apps/plan-assistant/frontend-nginx-configmap.yaml", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}

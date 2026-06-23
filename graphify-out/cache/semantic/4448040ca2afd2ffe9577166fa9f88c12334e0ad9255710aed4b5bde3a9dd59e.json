@@ -1,0 +1,1 @@
+{"nodes": [{"id": "n8n_values_configmap", "label": "ConfigMap n8n-values", "file_type": "code", "source_file": "apps/n8n/n8n-values.yaml", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}
