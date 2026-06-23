@@ -15,7 +15,7 @@ spec:
       labels:
         app: hermes
       annotations:
-        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-pro-2026-06-22b"
+        hermes.kvarnberg.io/config-generation: "opencode-go-deepseek-v4-pro-2026-06-22b-userlim12k"
     spec:
       serviceAccountName: hermes-autonomy
       imagePullSecrets:
@@ -64,8 +64,10 @@ spec:
                 su hermes -c "/opt/hermes/.venv/bin/hermes config set auxiliary.$t.base_url '$HERMES_INFERENCE_BASE_URL'"
                 su hermes -c "/opt/hermes/.venv/bin/hermes config set auxiliary.$t.model deepseek-v4-flash"
               done
-              # Memory: raise limit so agent stops looping on 'would exceed the limit'
+              # Memory: raise limits so agent stops looping on 'would exceed the limit'
               su hermes -c "/opt/hermes/.venv/bin/hermes config set memory.memory_char_limit 8000"
+              # User profile: raise to fit several distinct user profiles (was 1375 default)
+              su hermes -c "/opt/hermes/.venv/bin/hermes config set memory.user_char_limit 12000"
               # Loop safety: stop runaway same-tool retries gracefully
               su hermes -c "/opt/hermes/.venv/bin/hermes config set tool_loop_guardrails.hard_stop_enabled true"
           envFrom:
