@@ -6,5 +6,5 @@ metadata:
 data:
   daemon.json: |
     {
-      "insecure-registries": ["forgejo.lan"]
+      "insecure-registries": ["forgejo.lan", "10.43.4.61:3000"]
     }
