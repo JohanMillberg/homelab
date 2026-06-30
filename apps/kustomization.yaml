@@ -10,3 +10,4 @@ resources:
   - act-runner
   - hermes
   - cycling-training-app
+  - tailscale

@@ -1,0 +1,42 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: plan-assistant-tailscale
+  namespace: plan-assistant
+spec:
+  ingressClassName: tailscale
+  rules:
+    - host: plan-assistant
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: plan-assistant-backend
+                port:
+                  number: 8000
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: plan-assistant-backend
+                port:
+                  number: 8000
+          - path: /ready
+            pathType: Exact
+            backend:
+              service:
+                name: plan-assistant-backend
+                port:
+                  number: 8000
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: plan-assistant-frontend
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - plan-assistant

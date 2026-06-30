@@ -5,3 +5,4 @@ resources:
   - n8n-helmrelease.yaml
   - n8n-values.yaml
   - n8n-sealed-secret.yaml
+  - tailscale-ingress.yaml

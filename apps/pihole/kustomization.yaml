@@ -5,3 +5,4 @@ resources:
   - pihole-values.yaml
   - pihole-helmrelease.yaml
   - pihole-sealed-secret.yaml
+  - tailscale-ingress.yaml

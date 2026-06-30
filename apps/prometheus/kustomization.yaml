@@ -4,3 +4,4 @@ resources:
   - namespace.yaml
   - prometheus-helmrelease.yaml
   - prometheus-values.yaml
+  - tailscale-ingress.yaml

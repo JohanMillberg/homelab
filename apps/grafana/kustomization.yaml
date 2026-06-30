@@ -5,4 +5,5 @@ resources:
   - grafana-helmrelease.yaml
   - grafana-values.yaml
   - grafana-sealed-secret.yaml
+  - tailscale-ingress.yaml
   - ./dashboards

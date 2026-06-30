@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tailscale-values
+  namespace: tailscale
+data:
+  values.yaml: |
+    oauthSecretVolume:
+      secret:
+        secretName: tailscale-oauth
+        items:
+          - key: client_id
+            path: client_id
+          - key: client_secret
+            path: client_secret
+
+    operatorConfig:
+      defaultTags:
+        - tag:k8s-operator
+      hostname: homelab-tailscale-operator
+
+    proxyConfig:
+      defaultTags: tag:homelab

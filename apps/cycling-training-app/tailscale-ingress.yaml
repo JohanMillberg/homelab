@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cycling-training-app-tailscale
+  namespace: cycling-training-app
+spec:
+  ingressClassName: tailscale
+  defaultBackend:
+    service:
+      name: cycling-training-app
+      port:
+        number: 8000
+  tls:
+    - hosts:
+        - cycling

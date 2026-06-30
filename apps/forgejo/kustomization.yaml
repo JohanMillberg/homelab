@@ -5,3 +5,4 @@ resources:
   - forgejo-values.yaml
   - forgejo-sealed-secret.yaml
   - namespace.yaml
+  - tailscale-ingress.yaml

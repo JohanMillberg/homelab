@@ -10,3 +10,4 @@ resources:
   - n8n-helmrepo.yaml
   - prometheus-helmrepo.yaml
   - grafana-helmrepo.yaml
+  - tailscale-helmrepo.yaml
